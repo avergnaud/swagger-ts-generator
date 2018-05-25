@@ -6,7 +6,7 @@ Use it in combination with the sibling package [angular-swagger-form-field](http
 See [angular-swagger-form-field-sample](https://github.com/areijngoudt/angular-swagger-form-field-sample) for a sample how to use the generated classes.
 
 # Setup
-Download the moduel with npm:
+Download the module with npm:
 
 ```bash
 npm install --save-dev swagger-ts-generator
@@ -142,7 +142,7 @@ function log(msg) {
     $.util.log($.util.colors.yellow(msg));
 }
 ```
- 
+
 ## Execute the gulp task(s)
 Download the swagger file and generate the code:
 
@@ -153,7 +153,7 @@ gulp gen
 # Generated files
 
 ## `validators.ts`
-The generated validators.ts is fixed (its always generated regardless of the Swagger). 
+The generated validators.ts is fixed (its always generated regardless of the Swagger).
 It contains some extra validators to implement validation rules for the Swagger which are not part of the standard Angular validators:
 
 ```typescript
@@ -162,22 +162,22 @@ It contains some extra validators to implement validation rules for the Swagger 
 ```
 
 ## `base-model.ts`
-The generated base-model.ts is fixed (its always generated regardless of the Swagger). 
+The generated base-model.ts is fixed (its always generated regardless of the Swagger).
 It contains the base class for all generated models. The next members can be used in your own software:
 
 ```typescript
-    /** 
-    * use $formGroup in angular's formBuilder to make a model driven (reactive) form. 
+    /**
+    * use $formGroup in angular's formBuilder to make a model driven (reactive) form.
     *   this.form = this.formBuilder.group({
     *       pet: this.pet.$formGroup,
-    *   }); 
+    *   });
     */
     $formGroup: FormGroup;
 
-    /** 
+    /**
     * add one or more additional validators to the control
-    * @param key Name of the control (is the same as the name of the attached model property) 
-    * @param validators Validator(s) to add to the control 
+    * @param key Name of the control (is the same as the name of the attached model property)
+    * @param validators Validator(s) to add to the control
     */
     addValidatorToControl(controlName: string, validators: ValidatorFn | ValidatorFn[]) {
         ...
@@ -236,9 +236,9 @@ export class Pet extends BaseModel implements IPet {
     testDate: NullableOrEmpty<Date>;
     primitiveArray: Array<string>;
 
-    /** 
+    /**
     * constructor
-    * @param values Can be used to set a webapi response to this newly constructed model   
+    * @param values Can be used to set a webapi response to this newly constructed model
     */
     constructor(values?: any) {
         super();
@@ -252,7 +252,7 @@ export class Pet extends BaseModel implements IPet {
         }
     }
 
-    /** 
+    /**
     * set the values.
     * @param values Can be used to set a webapi response to this newly constructed model
     */
@@ -332,7 +332,7 @@ export enum hairColor {
 *   import { AllEnums, minValueValidator, maxValueValidator } from '../../models/webapi';
 *
 *   @Component({
-*       ... 
+*       ...
 *   })
 *   export class xxxComponent implements OnInit {
 *       allEnums = AllEnums;
@@ -358,7 +358,7 @@ export class AllEnums {
     gender = gender;
     hairColor = hairColor;
 }
-```    
+```
 
 Normally enums are numbers based in TypeScript. In out Webapi's whe use stringbased Enums.
 The thick with <code>cat = `<any>`"cat"</code> is used to make the TypeScript enums string based.
