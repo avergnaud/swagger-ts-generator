@@ -191,7 +191,7 @@ function getTypeNameWithoutNamespacePrefixesToRemove(key, options) {
     });
     return key;
 }
-const getTypeNameFromItem = (item, options, isEnum) => {
+const getTypeNameFromItem = (item, propname, options, isEnum) => {
     if (item.type == 'integer') {
         return 'number';
     } else if (item.type == 'string' && item.format == 'date') {
@@ -199,14 +199,14 @@ const getTypeNameFromItem = (item, options, isEnum) => {
     } else if (item.type == 'string' && item.format == 'date-time') {
         return 'Date';
     } else if (item.type == 'string' && item.enum) {
-        return `${name}`;
+        return propname;
     } else if (item.type == 'array' && item.items) {
-        const arrayPropType = getPropertyType(item.items, name, options, isEnum);
+        const arrayPropType = getPropertyType(item.items, propname, options, isEnum);
         return `Array<${arrayPropType.typeName}>`;
     }
     return item.type;
 };
-function getPropertyType(item, name, options, isEnum) {
+function getPropertyType(item, propname, options, isEnum) {
     let result = {
         typeName: '',
         namespace: '',
@@ -215,9 +215,9 @@ function getPropertyType(item, name, options, isEnum) {
         arrayTypeName: undefined
     };
     if (item.type) {
-        result.typeName = getTypeNameFromItem(item, options, isEnum);
+        result.typeName = getTypeNameFromItem(item, options, isEnum, propname);
         if (item.type == 'array' && item.items) {
-            let arrayPropType = getPropertyType(item.items, name, options, isEnum);
+            let arrayPropType = getPropertyType(item.items, propname, options, isEnum);
             result.namespace = arrayPropType.namespace;
             result.isArrayComplexType = !isEnum ? item.items.$ref : false;
             result.arrayTypeName = arrayPropType.typeName;
