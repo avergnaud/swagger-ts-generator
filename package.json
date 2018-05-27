@@ -6,24 +6,21 @@
   "scripts": {
     "build": "tsc",
     "watch": "npm run build -- --watch",
-    "publish-patch": "npm version patch && npm publish"
+    "publish-patch": "npx babel  build --out-dir built && npm version patch && npm publish"
   },
   "keywords": [
     "Swagger",
     "Code Generator",
     "models",
-    "Angular",
-    "Angular2+",
-    "Angular 2+",
     "ngx",
     "model-driven forms",
     "reactive forms"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/areijngoudt/swagger-ts-generator"
+    "url": "https://github.com/avergnaud/swagger-ts-generator"
   },
-  "author": "Ad Reijngoudt <areijngoudt@gmail.com>",
+  "author": "A.Vergnaud & Y.Serra forked thanks to  areijngoudt@gmail.com",
   "license": "ISC",
   "dependencies": {
     "@types/lodash": "^4.14.109",

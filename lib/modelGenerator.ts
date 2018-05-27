@@ -255,7 +255,7 @@ function getPropertyType(item:any, propname:any, options:any, isEnum:any): Prope
         arrayTypeName: undefined
     }
     if (item.type) {
-        result.typeName = getTypeNameFromItem(item, options,isEnum, propname)
+        result.typeName = getTypeNameFromItem(item, propname, options,isEnum )
         if (item.type == 'array' && item.items) {
             let arrayPropType = getPropertyType(item.items, propname, options, isEnum);
             result.namespace = arrayPropType.namespace;
