@@ -25,9 +25,7 @@ export function writeFileIfContentsIsChanged(outputFileName, contents) {
         let oldContents = readFile(outputFileName);
         isChanged = oldContents !== contents;
     }
-    if (isChanged) {
-        writeFile(outputFileName, contents);
-    }
+    isChanged && writeFile(outputFileName, contents);
     return isChanged;
 }
 export function ensureFile(outputFileName, contents) {

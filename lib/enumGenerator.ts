@@ -110,7 +110,7 @@ function filterEnumDefinitions(enumTypeCollection:any, node:any, options:any, en
                 // add string with joined values so enums with the same values can be detected
                 enumType.joinedValues = values.join(';')
                 // console.log(enumType);
-                // console.log('----------------------');
+                // console.log('--------------------');
                 enumTypeCollection.push(enumType)
             } else {
                 // enum array's has enum definition one level below (under "items")

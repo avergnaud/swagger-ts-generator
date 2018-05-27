@@ -12,13 +12,12 @@ const ROOT_NAMESPACE = 'root';
 const VALDIDATORS_FILE_NAME = 'validators.ts';
 const BASE_MODEL_FILE_NAME = 'base-model.ts';
 
-
 export function generateModelTSFiles(swagger:any, options:any) {
     let folder = path.normalize(options.modelFolder);
 
     // generate fixed file with the BaseModel class
     generateTSBaseModel(folder, options);
-    // get type definitions from swagger
+    // get type definitions from   swagger
     let typeCollection = getTypeDefinitions(swagger, options, MODEL_SUFFIX, MODEL_FILE_SUFFIX);
     // group types per namespace
     let namespaceGroups = getNamespaceGroups(typeCollection);

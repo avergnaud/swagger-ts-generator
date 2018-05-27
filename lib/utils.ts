@@ -1,5 +1,4 @@
 "use strict";
-
 /* global __dirname */
 let fs = require('fs');
 let path = require('path');
@@ -31,9 +30,8 @@ export function writeFileIfContentsIsChanged(outputFileName:any, contents:any) {
         let oldContents = readFile(outputFileName);
         isChanged = oldContents !== contents;
     }
-    if (isChanged) {
-        writeFile(outputFileName, contents);
-    }
+    isChanged && writeFile(outputFileName, contents);
+
     return isChanged;
 }
 

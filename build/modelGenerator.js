@@ -13,7 +13,7 @@ export function generateModelTSFiles(swagger, options) {
     let folder = path.normalize(options.modelFolder);
     // generate fixed file with the BaseModel class
     generateTSBaseModel(folder, options);
-    // get type definitions from swagger
+    // get type definitions from   swagger
     let typeCollection = getTypeDefinitions(swagger, options, MODEL_SUFFIX, MODEL_FILE_SUFFIX);
     // group types per namespace
     let namespaceGroups = getNamespaceGroups(typeCollection);
