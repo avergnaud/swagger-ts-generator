@@ -57,7 +57,7 @@ function generateTSBaseModel(folder, options) {
 function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
     let typeCollection = new Array();
     // console.log('typesToFilter', options.typesToFilter);
-    swagger.definitions.forEach((item, key) => {
+    (0, _lodash.forEach)(swagger.definitions, (item, key) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
             if (type) {

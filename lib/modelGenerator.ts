@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import path from 'path'
-import { keys, has, lowerFirst, kebabCase, upperFirst, each, endsWith, uniq } from 'lodash'
+import { keys, has, lowerFirst, kebabCase, upperFirst, each, endsWith, uniq, forEach } from 'lodash'
 import * as  utils from "./utils"
 
 const TS_SUFFIX = '.ts';
@@ -45,7 +45,7 @@ function generateTSBaseModel(folder:any, options:any) {
 function getTypeDefinitions(swagger:any, options:any, suffix:string, fileSuffix:string):Array<any> {
     let typeCollection = new Array();
     // console.log('typesToFilter', options.typesToFilter);
-    swagger.definitions.forEach( (item:any, key:any) => {
+    forEach(swagger.definitions, (item:any, key:any) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
             if (type) {

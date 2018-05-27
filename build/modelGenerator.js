@@ -1,7 +1,7 @@
 "use strict";
 import fs from 'fs';
 import path from 'path';
-import { keys, has, lowerFirst, kebabCase, upperFirst, each, endsWith, uniq } from 'lodash';
+import { keys, has, lowerFirst, kebabCase, upperFirst, each, endsWith, uniq, forEach } from 'lodash';
 import * as utils from "./utils";
 const TS_SUFFIX = '.ts';
 const MODEL_SUFFIX = '.model';
@@ -38,7 +38,7 @@ function generateTSBaseModel(folder, options) {
 function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
     let typeCollection = new Array();
     // console.log('typesToFilter', options.typesToFilter);
-    swagger.definitions.forEach((item, key) => {
+    forEach(swagger.definitions, (item, key) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
             if (type) {
