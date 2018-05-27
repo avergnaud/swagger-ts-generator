@@ -229,7 +229,7 @@ interface PropertyType extends Type {
     arrayTypeName?: string
 }
 
-const getTypeNameFromItem = (item:any, options?:any, isEnum?:boolean):string => {
+const getTypeNameFromItem = (item:any,propname:any, options?:any, isEnum?:boolean):string => {
     if (item.type == 'integer') {
         return 'number'
     } else if (item.type == 'string' && item.format == 'date') {
@@ -237,16 +237,16 @@ const getTypeNameFromItem = (item:any, options?:any, isEnum?:boolean):string => 
     } else if (item.type == 'string' && item.format == 'date-time') {
         return 'Date'
     } else if (item.type == 'string' && item.enum) {
-        return `${name}`
+        return propname
     } else if (item.type == 'array' && item.items) {
-        const arrayPropType = getPropertyType(item.items, name, options, isEnum);
+        const arrayPropType = getPropertyType(item.items, propname, options, isEnum);
         return `Array<${arrayPropType.typeName}>`;
     }
     return item.type
 }
 
 
-function getPropertyType(item:any, name:any, options:any, isEnum:any): PropertyType {
+function getPropertyType(item:any, propname:any, options:any, isEnum:any): PropertyType {
     let result: PropertyType = {
         typeName: '',
         namespace: '',
@@ -255,9 +255,9 @@ function getPropertyType(item:any, name:any, options:any, isEnum:any): PropertyT
         arrayTypeName: undefined
     }
     if (item.type) {
-        result.typeName = getTypeNameFromItem(item, options,isEnum)
+        result.typeName = getTypeNameFromItem(item, options,isEnum, propname)
         if (item.type == 'array' && item.items) {
-            let arrayPropType = getPropertyType(item.items, name, options, isEnum);
+            let arrayPropType = getPropertyType(item.items, propname, options, isEnum);
             result.namespace = arrayPropType.namespace;
             result.isArrayComplexType = !isEnum ? item.items.$ref : false;
             result.arrayTypeName = arrayPropType.typeName;
