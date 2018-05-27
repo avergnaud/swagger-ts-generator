@@ -93,7 +93,7 @@ function getEnumDefinitions(swagger:any, options:any) {
 }
 
 function filterEnumDefinitions(enumTypeCollection:any, node:any, options:any, enumArrayType?:any) {
-    node.forEach(function (item:any, key:any) {
+    _.forEach(node, function (item:any, key:any) {
         if (_.isObject(item) && (!utils.isInTypesToFilter(item, key, options))) {
             if (item.enum) {
                 let type = enumArrayType ? enumArrayType : key;
