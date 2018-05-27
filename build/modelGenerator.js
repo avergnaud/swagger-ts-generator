@@ -77,7 +77,7 @@ function getTypeDefinition(swagger, typeCollection, item, key, options, suffix, 
         typeName, namespace, fullNamespace, isSubType, baseType, baseImportFile,
         path: utils.convertNamespaceToPath(namespace), pathToRoot, properties: []
     };
-    properties.forEach((item, key) => {
+    forEach(properties, (item, key) => {
         let property = getTypePropertyDefinition(swagger, type, baseType, required, item, key, options, suffix, fileSuffix);
         type.properties.push(property);
     });
