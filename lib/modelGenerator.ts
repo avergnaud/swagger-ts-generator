@@ -1,10 +1,9 @@
 "use strict";
 
-let fs = require('fs');
-let path = require('path');
-let _ = require('lodash');
-
-let utils = require('./utils');
+import fs from 'fs'
+import path from 'path'
+import { keys, has, lowerFirst, kebabCase, upperFirst, each, endsWith, uniq } from 'lodash'
+import * as  utils from "./utils"
 
 const TS_SUFFIX = '.ts';
 const MODEL_SUFFIX = '.model';
@@ -13,11 +12,8 @@ const ROOT_NAMESPACE = 'root';
 const VALDIDATORS_FILE_NAME = 'validators.ts';
 const BASE_MODEL_FILE_NAME = 'base-model.ts';
 
-module.exports = {
-    generateModelTSFiles: generateModelTSFiles,
-}
 
-function generateModelTSFiles(swagger, options) {
+export function generateModelTSFiles(swagger:any, options:any) {
     let folder = path.normalize(options.modelFolder);
 
     // generate fixed file with the BaseModel class
@@ -32,7 +28,7 @@ function generateModelTSFiles(swagger, options) {
     generateBarrelFiles(namespaceGroups, folder, options);
 }
 
-function generateTSBaseModel(folder, options) {
+function generateTSBaseModel(folder:any, options:any) {
     if(!options.generateClasses)
         return;
 
@@ -47,10 +43,10 @@ function generateTSBaseModel(folder, options) {
     }
 }
 
-function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
+function getTypeDefinitions(swagger:any, options:any, suffix:string, fileSuffix:string):Array<any> {
     let typeCollection = new Array();
     // console.log('typesToFilter', options.typesToFilter);
-    _.forEach(swagger.definitions, (item, key) => {
+    swagger.definitions.forEach( (item:any, key:any) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
             if (type) {
@@ -59,11 +55,26 @@ function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
         }
     });
     // filter on unique types
-    typeCollection = _.uniq(typeCollection, 'type');
-    return typeCollection;
+    return uniq(typeCollection)
 }
 
-function getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix) {
+interface Type {
+    typeName: string
+    namespace: string
+    fullNamespace?: string
+}
+
+interface TypeDefinition extends Type {
+    fileName: string
+    isSubType: boolean
+    baseType: string
+    baseImportFile?: string
+    path: string
+    pathToRoot: string
+    properties: Array<any>
+}
+
+function getTypeDefinition(swagger:any, typeCollection:any, item:any, key:any, options:any, suffix:string, fileSuffix:string) {
     // filter enum types (these are gererated by the enumGenerator)
     let isEnumType = getIsEnumType(item);
     if (isEnumType) {
@@ -79,29 +90,28 @@ function getTypeDefinition(swagger, typeCollection, item, key, options, suffix, 
     }
     let pathToRoot = utils.getPathToRoot(namespace);
     let properties = options.sortModelProperties ?  utils.getSortedObjectProperties(item.properties) : item.properties;
-    let baseType = undefined;
     let baseImportFile = undefined;
     let isSubType = getIsSubType(item);
+    const baseType= isSubType ?  getBaseType(typeCollection, item, options) : undefined
     if (isSubType) {
-        baseType = getBaseType(typeCollection, item, options);
         baseImportFile = getImportFile(baseType.typeName, baseType.namespace, pathToRoot, suffix);
         required = getSubTypeRequired(item);
         properties = getSubTypeProperties(item, baseType);
     }
 
-    let type = {
+    let type:TypeDefinition = {
         fileName: getFileName(key, options, fileSuffix),
         typeName,namespace,fullNamespace,isSubType,baseType,baseImportFile,
         path: utils.convertNamespaceToPath(namespace),pathToRoot,properties: []
     }
-    _.forEach(properties, (item, key) => {
+    properties.forEach( (item:any, key:any) => {
         let property = getTypePropertyDefinition(swagger, type, baseType, required, item, key, options, suffix, fileSuffix)
         type.properties.push(property);
     });
     return type;
 }
 
-function getTypePropertyDefinition(swagger, type, baseType, required, item, key, options, suffix, fileSuffix) {
+function getTypePropertyDefinition(swagger:any, type:any, baseType:any|undefined, required:any, item:any, key:any, options:any, suffix:any, fileSuffix:any) {
     let isRefType = item.$ref;
     let isArray = item.type == 'array';
     let isEnum = (item.type == 'string' && item.enum) ||
@@ -112,7 +122,6 @@ function getTypePropertyDefinition(swagger, type, baseType, required, item, key,
         isRefType = false;
     }
     let propertyType = getPropertyType(item, key, options, isEnum);
-    let isComplexType = isRefType || isArray; // new this one in constructor
     let isImportType = isRefType || (isArray && item.items.$ref && !isEnum);
     let importType = isImportType ? getImportType(propertyType.typeName, isArray) : undefined;
     let importFile = isImportType ? getImportFile(importType, propertyType.namespace, type.pathToRoot, suffix) : undefined;
@@ -120,25 +129,41 @@ function getTypePropertyDefinition(swagger, type, baseType, required, item, key,
     let isUniqueImportType = isImportType && !importTypeIsPropertyType && getIsUniqueImportType(importType, baseType, type.properties); // import this type
 
     let validators = getTypePropertyValidatorDefinitions(required, item, key, propertyType.typeName, isEnum);
-    let hasValidation = _.keys(validators.validation).length > 0;
+    let hasValidation = keys(validators.validation).length > 0;
 
     let importEnumType = isEnum ? removeGenericArray(propertyType.typeName, isArray) : undefined;
     let isUniqueImportEnumType = isEnum && getIsUniqueImportEnumType(propertyType.typeName, type.properties); // import this enumType
     const { typeName, namespace, isArrayComplexType, arrayTypeName  } = propertyType
     let property = {
         name: key,typeName,namespace,
-        description: item.description,hasValidation,isComplexType,
+        description: item.description,hasValidation,
+        isComplexType: isRefType || isArray, // new this one in constructor ,
         isImportType,isUniqueImportType,importType,importFile,isEnum,isUniqueImportEnumType,
         importEnumType,isArray,isArrayComplexType,arrayTypeName,validators,enum: item.enum,
     }
     return property;
 }
 
-function getTypePropertyValidatorDefinitions(required, item, key, typeName, isEnum) {
-    let isRequired = _.indexOf(required, key) !== -1;
+interface validationType {
+    required?:boolean
+    minimum?: number
+    maximum?: number
+    enum?: string
+    minLength?: number
+    maxLength?: number
+    pattern?: string
+}
+
+interface validatorsDef {
+    validation:validationType
+    validatorArray:Array<string>
+}
+
+function getTypePropertyValidatorDefinitions(required:any, item:any, key:any, typeName:any, isEnum:any) {
+    let isRequired = required.indexOf(key) !== -1;
     // console.log('key=', key, 'typeName', typeName, 'item=', item, 'enum=', item.enum);
 
-    let validators = {
+    let validators:validatorsDef = {
         validation: {},
         validatorArray: []
     }
@@ -146,11 +171,11 @@ function getTypePropertyValidatorDefinitions(required, item, key, typeName, isEn
         validators.validation.required = isRequired
         validators.validatorArray.push('Validators.required');
     }
-    if (_.has(item, 'minimum')) {
+    if (has(item, 'minimum')) {
         validators.validation.minimum = item.minimum
         validators.validatorArray.push(`minValueValidator(${item.minimum})`);
     }
-    if (_.has(item, 'maximum')) {
+    if (has(item, 'maximum')) {
         validators.validation.maximum = item.maximum
         validators.validatorArray.push(`maxValueValidator(${item.maximum})`);
     }
@@ -158,43 +183,40 @@ function getTypePropertyValidatorDefinitions(required, item, key, typeName, isEn
         validators.validation.enum = `'${item.enum}'`
         validators.validatorArray.push(`enumValidator(${typeName})`);
     }
-    if (_.has(item, 'minLength')) {
+    if (has(item, 'minLength')) {
         validators.validation.minLength = item.minLength
         validators.validatorArray.push(`Validators.minLength(${item.minLength})`);
     }
-    if (_.has(item, 'maxLength')) {
+    if (has(item, 'maxLength')) {
         validators.validation.maxLength = item.maxLength
         validators.validatorArray.push(`Validators.maxLength(${item.maxLength})`);
     }
-    if (_.has(item, 'pattern')) {
+    if (has(item, 'pattern')) {
         validators.validation.pattern = `'${item.pattern}'`
         validators.validatorArray.push(`Validators.pattern('${item.pattern}')`);
     }
     return validators;
 }
 
-function getIsUniqueImportType(currentTypeName, baseType, typeProperties) {
+function getIsUniqueImportType(currentTypeName:any, baseType:any, typeProperties:any) {
     let baseTypeName = baseType ? baseType.typeName : undefined;
     if (currentTypeName === baseTypeName) {
         return false;
-    }
-    return !_.some(typeProperties, (property) => {
-        return property.importType === currentTypeName;
-    });
+    } else return !typeProperties.some( (property:any) => property.importType === currentTypeName);
 }
 
-function getIsUniqueImportEnumType(currentTypeName, typeProperties) {
-    return !_.some(typeProperties, (property) => {
+function getIsUniqueImportEnumType(currentTypeName:any, typeProperties:any) {
+    return !typeProperties.some((property:any) => {
         return property.importEnumType === currentTypeName;
-    });
+    })
 }
 
-function getTypeNameWithoutNamespacePrefixesToRemove(key, options) {
+function getTypeNameWithoutNamespacePrefixesToRemove(key:any, options:any) {
     if (!options.namespacePrefixesToRemove) {
         return key;
     }
     let namespaces = options.namespacePrefixesToRemove;
-    namespaces.forEach((item) => {
+    namespaces.forEach((item:any) => {
         key = key.replace(item, '');
         if (key[0] === '.') {
             key = key.substring(1);
@@ -203,8 +225,30 @@ function getTypeNameWithoutNamespacePrefixesToRemove(key, options) {
     return key;
 }
 
-function getPropertyType(item, name, options, isEnum) {
-    let result = {
+interface PropertyType extends Type {
+    isArrayComplexType: boolean
+    arrayTypeName?: string
+}
+
+const getTypeNameFromItem = (item:any, options?:any, isEnum?:boolean):string => {
+    if (item.type == 'integer') {
+        return 'number'
+    } else if (item.type == 'string' && item.format == 'date') {
+        return 'Date'
+    } else if (item.type == 'string' && item.format == 'date-time') {
+        return 'Date'
+    } else if (item.type == 'string' && item.enum) {
+        return `${name}`
+    } else if (item.type == 'array' && item.items) {
+        const arrayPropType = getPropertyType(item.items, name, options, isEnum);
+        return `Array<${arrayPropType.typeName}>`;
+    }
+    return item.type
+}
+
+
+function getPropertyType(item:any, name:any, options:any, isEnum:any): PropertyType {
+    let result: PropertyType = {
         typeName: '',
         namespace: '',
         fullNamespace: undefined,
@@ -212,29 +256,16 @@ function getPropertyType(item, name, options, isEnum) {
         arrayTypeName: undefined
     }
     if (item.type) {
-        result.typeName = item.type;
-        if (item.type == 'integer') {
-            result.typeName = 'number'
-        };
-        if (item.type == 'string' && item.format == 'date') {
-            result.typeName = 'Date'
-        };
-        if (item.type == 'string' && item.format == 'date-time') {
-            result.typeName = 'Date'
-        };
-        if (item.type == 'string' && item.enum) {
-            result.typeName = `${name}`
-        };
+        result.typeName = getTypeNameFromItem(item, options,isEnum)
         if (item.type == 'array' && item.items) {
             let arrayPropType = getPropertyType(item.items, name, options, isEnum);
-            result.typeName = `Array<${arrayPropType.typeName}>`;
             result.namespace = arrayPropType.namespace;
             result.isArrayComplexType = !isEnum ? item.items.$ref : false;
             result.arrayTypeName = arrayPropType.typeName;
         };
         // description may contain an overrule type for enums, eg /** type CoverType */
         if (utils.hasTypeFromDescription(item.description)) {
-            result.typeName = _.lowerFirst(utils.getTypeFromDescription(item.description))
+            result.typeName = lowerFirst(utils.getTypeFromDescription(item.description))
             // fix enum array with overrule type
             if (item.type == 'array' && item.items) {
                 result.arrayTypeName = result.typeName;
@@ -243,8 +274,7 @@ function getPropertyType(item, name, options, isEnum) {
         }
 
         return result;
-    }
-    if (item.$ref) {
+    } else if (item.$ref) {
         let type = removeDefinitionsRef(item.$ref);
         result.typeName = getTypeName(type, options);
         result.namespace = getNamespace(type, options, true);
@@ -260,19 +290,21 @@ function getPropertyType(item, name, options, isEnum) {
 
         return result;
     }
+    console.log("cas inattendu")
+    return result
 }
 
-function removeDefinitionsRef(value) {
+function removeDefinitionsRef(value:any) {
     let result = value.replace('#/definitions/', '');
     return result;
 }
 
-function getFileName(type, options, fileSuffix) {
+function getFileName(type:any, options:any, fileSuffix:any) {
     let typeName = removeGenericTType(getTypeName(type, options));
-    return `${_.kebabCase(typeName)}${fileSuffix}`;
+    return `${kebabCase(typeName)}${fileSuffix}`;
 }
 
-function getTypeName(type, options) {
+function getTypeName(type:any, options:any) {
     let typeName;
     if (getIsGenericType(type)) {
         let startGenericT = type.indexOf('[');
@@ -289,38 +321,39 @@ function getTypeName(type, options) {
         }
         //classNameSuffixesToRemove
     }
-    return _.upperFirst(typeName);
+    return upperFirst(typeName);
 }
 
-function getTypeNameWithoutSuffixesToRemove(typeName, options) {
+function getTypeNameWithoutSuffixesToRemove(typeName:any, options:any) {
     if (!options.typeNameSuffixesToRemove) {
         return typeName;
     }
     let typeNameSuffixesToRemove = options.typeNameSuffixesToRemove;
-    typeNameSuffixesToRemove.forEach((item) => {
-        if (_.endsWith(typeName, item)) {
+    typeNameSuffixesToRemove.forEach((item:any) => {
+        if (endsWith(typeName, item)) {
             typeName = typeName.slice(0, -item.length);
         }
     });
     return typeName;
 }
 
-function getIsGenericType(type) {
+function getIsGenericType(type:any) {
     return type.indexOf('[') !== -1 || type.indexOf('<') !== -1;
 }
 /**
  * NullableOrEmpty<System.Date> -> System.Data
  */
-function getGenericTType(type) {
+function getGenericTType(type:string) {
     if (getIsGenericType(type)) {
-        return /\<(.*)\>/.exec(type)[1];
+        const t = /\<(.*)\>/.exec(type)
+        return t && t[1];
     }
     return undefined;
 }
 /**
  * NullableOrEmpty<System.Date> -> NullableOrEmpty
  */
-function removeGenericTType(type) {
+function removeGenericTType(type:any) {
     if (getIsGenericType(type)) {
         type = type.substring(0, type.indexOf('<'));
     }
@@ -329,48 +362,48 @@ function removeGenericTType(type) {
 /**
  * NullableOrEmpty[System.Date] -> NullableOrEmpty<System.Date>
  */
-function convertGenericTypeName(typeName) {
+function convertGenericTypeName(typeName:string) {
     return typeName.replace('[', '<').replace(']', '>');
 }
 /**
  * NullableOrEmpty<System.Date> -> NullableOrEmpty<T>
  */
-function convertGenericToGenericT(typeName) {
+function convertGenericToGenericT(typeName:string) {
     return typeName.replace(/\<.*\>/, '<T>');
 }
 
-function getIsSubType(item) {
+function getIsSubType(item:any) {
     return item.allOf !== undefined;
 }
 
-function getBaseType(typeCollection, item, options) {
+function getBaseType(typeCollection:any, item:any, options:any) {
     // TODO how about more than one baseType?
     let type = removeDefinitionsRef(item.allOf[0].$ref);
     let typeName = getTypeName(type, options);
     //let namespace = getNamespace(type, options);
-    let baseType = _.find(typeCollection, type => {
+    let baseType = typeCollection.find( (type:any) => {
         return type.typeName === typeName;
         //return type.typeName === typeName && type.namespace === namespace;
     })
     return baseType;
 }
 
-function getSubTypeProperties(item, baseType) {
+function getSubTypeProperties(item:any, baseType:any) {
     // TODO strip properties which are defined in the baseType?
     let properties = item.allOf[1].properties;
     return properties;
 }
 
-function getSubTypeRequired(item) {
+function getSubTypeRequired(item:any) {
     let required = item.allOf[1].required || [];
     return required;
 }
 
-function getIsEnumType(item) {
+function getIsEnumType(item:any) {
     return item && item.enum;
 }
 
-function getIsEnumRefType(swagger, item, isArray) {
+function getIsEnumRefType(swagger:any, item:any, isArray:any) {
     let refItemName;
     if (isArray) {
         // "perilTypesIncluded": {
@@ -393,7 +426,7 @@ function getIsEnumRefType(swagger, item, isArray) {
     return getIsEnumType(refItem);
 }
 
-function getNamespace(type, options, removePrefix) {
+function getNamespace(type:any, options:any, removePrefix:any) {
     let typeName = removePrefix ? getTypeNameWithoutNamespacePrefixesToRemove(type, options) : type;
 
     if (getIsGenericType(typeName)) {
@@ -405,7 +438,7 @@ function getNamespace(type, options, removePrefix) {
     return parts.join('.');
 }
 
-function getImportType(type, isArray) {
+function getImportType(type:any, isArray:boolean) {
     if (isArray) {
         let result = removeGenericArray(type, isArray);
         return result;
@@ -415,7 +448,7 @@ function getImportType(type, isArray) {
     return type;
 }
 
-function removeGenericArray(type, isArray) {
+function removeGenericArray(type:any, isArray:boolean) {
     if (isArray) {
         let result = type.replace('Array<', '').replace('>', '');
         return result;
@@ -423,9 +456,8 @@ function removeGenericArray(type, isArray) {
     return type;
 }
 
-function getImportFile(propTypeName, propNamespace, pathToRoot, suffix) {
-    //return `${_.lowerFirst(type)}${suffix}`;
-    let importPath = `${_.kebabCase(propTypeName)}${suffix}`;
+function getImportFile(propTypeName:any, propNamespace:any, pathToRoot:any, suffix:any) {
+    let importPath = `${kebabCase(propTypeName)}${suffix}`;
     if (propNamespace) {
         let namespacePath = utils.convertNamespaceToPath(propNamespace);
         importPath = `${namespacePath}/${importPath}`;
@@ -434,8 +466,8 @@ function getImportFile(propTypeName, propNamespace, pathToRoot, suffix) {
     return (pathToRoot + importPath).toLocaleLowerCase();
 }
 
-function getNamespaceGroups(typeCollection) {
-    let namespaces = {
+function getNamespaceGroups(typeCollection:any) {
+    let namespaces:{[key:string]:Array<string>} = {
         [ROOT_NAMESPACE]: []
     };
     for (let i = 0; i < typeCollection.length; ++i) {
@@ -449,7 +481,7 @@ function getNamespaceGroups(typeCollection) {
     return namespaces;
 }
 
-function generateTSModels(namespaceGroups, folder, options) {
+function generateTSModels(namespaceGroups:any, folder:any, options:any) {
     let data = {
         generateClasses: options.generateClasses,
         moduleName: options.modelModuleName,
@@ -469,13 +501,13 @@ function generateTSModels(namespaceGroups, folder, options) {
         let typeFolder = `${folder}${namespacePath}`;
         let folderParts = namespacePath.split('/');
         let prevParts = folder;
-        folderParts.forEach((part) => {
+        folderParts.forEach((part:any) => {
             prevParts += part + '/';
             utils.ensureFolder(prevParts);
         });
 
         let nrGeneratedFiles = 0;
-        _.each(typeCol, (type) => {
+        each(typeCol, (type:any) => {
             let outputFileName = path.join(typeFolder, type.fileName);
             data.type = type;
             let result = template(data);
@@ -494,11 +526,11 @@ function generateTSModels(namespaceGroups, folder, options) {
     cleanFoldersForObsoleteFiles(folder, namespacePaths);
 }
 
-function cleanFoldersForObsoleteFiles(folder, namespacePaths) {
-    utils.getDirectories(folder).forEach(name => {
+function cleanFoldersForObsoleteFiles(folder:any, namespacePaths:any) {
+    utils.getDirectories(folder).forEach((name:string) => {
         let folderPath = path.join(folder, name);
         // TODO bij swagger-zib-v2 wordt de webapi/ZIB folder weggegooid !
-        let namespacePath = _.find(namespacePaths, path => {
+        let namespacePath = namespacePaths.find( (path:any) => {
             return path.startsWith(folderPath);
         });
         if (!namespacePath) {
@@ -510,14 +542,14 @@ function cleanFoldersForObsoleteFiles(folder, namespacePaths) {
     });
 }
 
-function generateBarrelFiles(namespaceGroups, folder, options) {
+function generateBarrelFiles(namespaceGroups:any, folder:any, options:any) {
     let data = {
         fileNames: undefined
     };
     let template = utils.readAndCompileTemplateFile('generate-barrel-ts.hbs');
 
     for (let key in namespaceGroups) {
-        data.fileNames = namespaceGroups[key].map((type) => {
+        data.fileNames = namespaceGroups[key].map((type:any) => {
             return removeTsExtention(type.fileName);
         });
         if (key === ROOT_NAMESPACE) {
@@ -534,7 +566,7 @@ function generateBarrelFiles(namespaceGroups, folder, options) {
     }
 }
 
-function addRootFixedFileNames(fileNames, options) {
+function addRootFixedFileNames(fileNames:any, options:any) {
     let enumOutputFileName = path.normalize(options.enumTSFile.split('/').pop());
     fileNames.splice(0, 0, removeTsExtention(enumOutputFileName));
     if(options.generateClasses) {
@@ -543,16 +575,16 @@ function addRootFixedFileNames(fileNames, options) {
     }
 }
 
-function removeTsExtention(fileName) {
+function removeTsExtention(fileName:string) {
     return fileName.replace('.ts', '');
 }
 
-function removeFilesOfNonExistingTypes(typeCollection, folder, options, suffix) {
+function removeFilesOfNonExistingTypes(typeCollection:any, folder:any, options:any, suffix:any) {
     // remove files of types which are no longer defined in typeCollection
     let counter = 0;
     let files = fs.readdirSync(folder);
-    _.each(files, (file) => {
-        if (_.endsWith(file, suffix) && !_.find(typeCollection, (type) => {
+    each(files, (file:any) => {
+        if (endsWith(file, suffix) && !typeCollection.find( (type:any) => {
                 return type.fileName == file;
             })) {
             counter++;

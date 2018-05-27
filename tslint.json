@@ -1,0 +1,53 @@
+{
+  "extends": "tslint:all",
+  "rules": {
+    "align": [true, "elements", "members", "parameters", "statements"],
+    "arrow-parens": false,
+    "comment-format": false,
+    "completed-docs": false,
+    "interface-name": false,
+    "match-default-export-name": false,
+    "newline-before-return": false,
+    "no-any": false,
+    "no-console": false,
+    "no-default-export": false,
+    "no-empty": false,
+    "no-floating-promises": false,
+    "no-inferrable-types": false,
+    "no-magic-numbers": false,
+    "no-null-keyword": false,
+    "no-require-imports": false,
+    "no-submodule-imports": false,
+    "no-this-assignment": [true, { "allow-destructuring": true }],
+    "no-unbound-method": false,
+    "no-unsafe-any": false,
+    "no-unused-variable": false,
+    "no-use-before-declare": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "only-arrow-functions": false,
+    "prefer-function-over-method": false,
+    "prefer-method-signature": false,
+    "prefer-switch": false,
+    "promise-function-async": false,
+    "quotemark": [true, "single", "jsx-double", "avoid-escape"],
+    "return-undefined": false,
+    "semicolon": [true, "never"],
+    "strict-boolean-expressions": false,
+    "strict-type-predicates": false,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": {
+          "arrays": "always",
+          "functions": "always",
+          "objects": "always",
+          "typeLiterals": "never"
+        },
+        "singleline": "never"
+      }
+    ],
+    "type-literal-delimiter": false,
+    "typedef": [true, "call-signature", "parameter", "property-declaration", "member-variable-declaration"],
+    "variable-name": false
+  }
+}

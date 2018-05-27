@@ -4,6 +4,8 @@
   "description": "Given a swagger.json file, generates a number of TypeScript files which can be used as models and model-driven forms in Angular 2 (and above)",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "watch": "npm run build -- --watch",
     "publish-patch": "npm version patch && npm publish"
   },
   "keywords": [
@@ -24,6 +26,8 @@
   "author": "Ad Reijngoudt <areijngoudt@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@types/lodash": "^4.14.109",
+    "@types/node": "^10.1.2",
     "fs": "0.0.2",
     "handlebars": "^4.0.11",
     "lodash": "^4.17.4",
@@ -39,6 +43,7 @@
     "gulp-streamify": "^1.0.2",
     "gulp-task-listing": "^1.0.1",
     "request": "^2.83.0",
+    "typescript": "^2.8.3",
     "vinyl-source-stream": "^1.1.2",
     "yargs": "^4.6.0"
   }

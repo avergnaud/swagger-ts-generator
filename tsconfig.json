@@ -1,0 +1,21 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-native",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "outDir": "build",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "pretty": true,
+    "rootDir": "lib",
+    "strict": true,
+    "target": "es2015"
+  },
+  "include": ["lib/**/*.ts", "typings/**/*.d.ts"]
+}

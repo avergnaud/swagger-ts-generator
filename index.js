@@ -5,9 +5,9 @@ let fs = require('fs');
 let path = require('path');
 let _ = require('lodash');
 
-let utils = require('./lib/utils');
-let modelGenerator = require('./lib/modelGenerator');
-let enumGenerator = require('./lib/enumGenerator');
+let utils = require('./build/utils');
+let modelGenerator = require('./build/modelGenerator');
+let enumGenerator = require('./build/enumGenerator');
 
 module.exports.generateTSFiles = generateTSFiles;
 

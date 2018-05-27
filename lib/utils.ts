@@ -8,43 +8,24 @@ let moment = require('moment');
 let _ = require('lodash');
 
 const TEMPLATE_FOLDER = '../templates';
-const ENCODING = 'utf8';
+export const ENCODING = 'utf8';
 
-module.exports = {
-    ENCODING: ENCODING,
-    readAndCompileTemplateFile: readAndCompileTemplateFile,
-    readFile: readFile,
-    writeFile: writeFile,
-    writeFileIfContentsIsChanged: writeFileIfContentsIsChanged,
-    ensureFile: ensureFile,
-    ensureFolder: ensureFolder,
-    getDirectories: getDirectories,
-    removeFolder: removeFolder,
-    getPathToRoot: getPathToRoot,
-    convertNamespaceToPath: convertNamespaceToPath,
-    getTypeFromDescription: getTypeFromDescription,
-    hasTypeFromDescription: hasTypeFromDescription,
-    getSortedObjectProperties: getSortedObjectProperties,
-    isInTypesToFilter: isInTypesToFilter,
-    log: log,
-}
-
-function readAndCompileTemplateFile(templateFileName) {
+export function readAndCompileTemplateFile(templateFileName:any) {
     let templateSource = fs.readFileSync(path.resolve(__dirname, TEMPLATE_FOLDER, templateFileName), ENCODING);
     let template = handlebars.compile(templateSource);
     return template;
 }
 
-function readFile(outputFileName) {
+export function readFile(outputFileName:any) {
     let file = fs.readFileSync(outputFileName, ENCODING);
     return file;
 }
 
-function writeFile(outputFileName, contents) {
+export function writeFile(outputFileName:any, contents:any) {
     fs.writeFileSync(outputFileName, contents, { flag: 'w', encoding: ENCODING });
 }
 
-function writeFileIfContentsIsChanged(outputFileName, contents) {
+export function writeFileIfContentsIsChanged(outputFileName:any, contents:any) {
     let isChanged = true;
     if (fs.existsSync(outputFileName)) {
         let oldContents = readFile(outputFileName);
@@ -56,28 +37,28 @@ function writeFileIfContentsIsChanged(outputFileName, contents) {
     return isChanged;
 }
 
-function ensureFile(outputFileName, contents) {
+export function ensureFile(outputFileName:any, contents:any) {
     ensureFolder(path.dirname(outputFileName));
     if (!fs.existsSync(outputFileName)) {
         fs.writeFileSync(outputFileName, contents, ENCODING);
     }
 }
 
-function ensureFolder(folder) {
+export function ensureFolder(folder:any) {
     if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder);
     }
 }
 
-function getDirectories(srcpath) {
-    return fs.readdirSync(srcpath).filter((file) => {
+export function getDirectories(srcpath:any) {
+    return fs.readdirSync(srcpath).filter((file:any) => {
         return fs.statSync(path.join(srcpath, file)).isDirectory();
     });
 }
 
-function removeFolder(folder) {
+export function removeFolder(folder:any) {
     if (fs.existsSync(folder)) {
-        fs.readdirSync(folder).forEach((file, index) => {
+        fs.readdirSync(folder).forEach((file:any, index:any) => {
             let curPath = folder + "/" + file;
             if (fs.lstatSync(curPath).isDirectory()) { // recurse
                 removeFolder(curPath);
@@ -89,7 +70,7 @@ function removeFolder(folder) {
     }
 }
 
-function getPathToRoot(namespace) {
+export function getPathToRoot(namespace:any) {
     let path = './';
     if (namespace) {
         path = '';
@@ -101,38 +82,38 @@ function getPathToRoot(namespace) {
     return path;
 }
 
-function convertNamespaceToPath(namespace) {
+export function convertNamespaceToPath(namespace:any) {
     let parts = namespace.split('.');
     for (let index = 0; index < parts.length; index++) {
         parts[index] =_.kebabCase(parts[index]);
     }
-    let result = parts.join('/');  
+    let result = parts.join('/');
     // let result = namespace.replace(/\./g, '/');
     return result;
 }
 
-function getTypeFromDescription(description) {
+export function getTypeFromDescription(description:any) {
     if (hasTypeFromDescription(description)) {
         description = description.replace('ts-type', '');
         return description.replace('type', '').trim();
     }
     return description;
 }
-function hasTypeFromDescription(description) {
+export function hasTypeFromDescription(description:any) {
     if (description) {
         return (description.startsWith('ts-type') || description.startsWith('type'));
     }
     return false;
 }
 
-function getSortedObjectProperties(object) {
+export function getSortedObjectProperties(object:any) {
     const result = _(object).toPairs().sortBy(0).fromPairs().value();
     return result;
 }
 
-function isInTypesToFilter(item, key, options) {
+export function isInTypesToFilter(item:any, key:any, options:any) {
     if (options && options.typesToFilter) {
-        const result = !!_.find(options.typesToFilter, element => { return element === key; });
+        const result = !!_.find(options.typesToFilter, (element:any) => { return element === key; });
         // if (result) {
         //     console.log('item in typesToFilter', key, result);
         // }
@@ -141,7 +122,7 @@ function isInTypesToFilter(item, key, options) {
     return false;
 }
 
-function log(message) {
+export function log(message:string) {
     let time = moment().format('HH:mm:SS');
     console.log(`[${time}] ${message}`);
 }
