@@ -211,7 +211,7 @@ function getIsUniqueImportEnumType(currentTypeName:any, typeProperties:any) {
 }
 
 function getTypeNameWithoutNamespacePrefixesToRemove(key:any, options:any) {
-    if (!options.namespacePrefixesToRemove) {
+    if (!options || !options.namespacePrefixesToRemove) {
         return key;
     }
     let namespaces = options.namespacePrefixesToRemove;
@@ -324,7 +324,7 @@ function getTypeName(type:any, options:any) {
 }
 
 function getTypeNameWithoutSuffixesToRemove(typeName:any, options:any) {
-    if (!options.typeNameSuffixesToRemove) {
+    if (!options || !options.typeNameSuffixesToRemove) {
         return typeName;
     }
     let typeNameSuffixesToRemove = options.typeNameSuffixesToRemove;
