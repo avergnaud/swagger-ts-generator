@@ -166,34 +166,19 @@ function getTypePropertyValidatorDefinitions(required:any, item:any, key:any, ty
         validation: {},
         validatorArray: []
     }
-    if (isRequired) {
-        validators.validation.required = isRequired
-        validators.validatorArray.push('Validators.required');
+
+    function pusher<K extends keyof validationType>  ( validationkey: K , value : validationType[K], key: string)  {
+        validators.validation[validationkey] = value
+        validators.validatorArray.push(key);
     }
-    if (has(item, 'minimum')) {
-        validators.validation.minimum = item.minimum
-        validators.validatorArray.push(`minValueValidator(${item.minimum})`);
-    }
-    if (has(item, 'maximum')) {
-        validators.validation.maximum = item.maximum
-        validators.validatorArray.push(`maxValueValidator(${item.maximum})`);
-    }
-    if (isEnum) {
-        validators.validation.enum = `'${item.enum}'`
-        validators.validatorArray.push(`enumValidator(${typeName})`);
-    }
-    if (has(item, 'minLength')) {
-        validators.validation.minLength = item.minLength
-        validators.validatorArray.push(`Validators.minLength(${item.minLength})`);
-    }
-    if (has(item, 'maxLength')) {
-        validators.validation.maxLength = item.maxLength
-        validators.validatorArray.push(`Validators.maxLength(${item.maxLength})`);
-    }
-    if (has(item, 'pattern')) {
-        validators.validation.pattern = `'${item.pattern}'`
-        validators.validatorArray.push(`Validators.pattern('${item.pattern}')`);
-    }
+
+    isRequired &&  pusher('required',isRequired,'Validators.required')
+    has(item, 'minimum') && pusher('minimum',item.minimum,`minValueValidator(${item.minimum})`)
+    has(item, 'maximum') && pusher('maximum',item.maximum,`maxValueValidator(${item.maximum})`)
+    isEnum && pusher('enum',`'${item.enum}'`,`enumValidator(${typeName})`)
+    has(item, 'minLength') && pusher('minLength',item.minLength, `Validators.minLength(${item.minLength})`)
+    has(item, 'maxLength') && pusher('maxLength',item.maxLength,`Validators.maxLength(${item.maxLength})`)
+    has(item, 'pattern') && pusher('pattern',`'${item.pattern}'`,`Validators.pattern('${item.pattern}')`  )
     return validators;
 }
 
@@ -232,9 +217,7 @@ interface PropertyType extends Type {
 const getTypeNameFromItem = (item:any,propname:any, options?:any, isEnum?:boolean):string => {
     if (item.type == 'integer') {
         return 'number'
-    } else if (item.type == 'string' && item.format == 'date') {
-        return 'Date'
-    } else if (item.type == 'string' && item.format == 'date-time') {
+    } else if (item.type == 'string' && ( item.format == 'date' || item.format == 'date-time')) {
         return 'Date'
     } else if (item.type == 'string' && item.enum) {
         return propname
@@ -244,7 +227,6 @@ const getTypeNameFromItem = (item:any,propname:any, options?:any, isEnum?:boolea
     }
     return item.type
 }
-
 
 function getPropertyType(item:any, propname:any, options:any, isEnum:any): PropertyType {
     let result: PropertyType = {
