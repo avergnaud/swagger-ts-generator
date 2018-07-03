@@ -106,7 +106,7 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
     _.forEach(node, function (item, key) {
         if (_.isObject(item) && !utils.isInTypesToFilter(item, key, options)) {
             if (item.enum) {
-                enumTypeCollection.push(processEnumDefinition(item.enum, key, item.description, enumArrayType));
+                //enumTypeCollection.push(processEnumDefinition(item.enum, key,item.description, enumArrayType))
             } else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
@@ -124,8 +124,6 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
                 }
                 filterEnumDefinitions(enumTypeCollection, item, options, enumArrayType);
             }
-        } else {
-            console.log("error");
         }
     });
 }
@@ -140,29 +138,13 @@ const processEnumDefinition = (enumValues, key, description, enumArrayType) => {
     const valuesAndLabels = getEnumValuesAndLabels(enumValues);
     //console.log("processEnumDefinition", enumValues);
     const joinedValues = enumValues.join(';'); // with joined values to detect enums with the same values
-    console.log({ type, valuesAndLabels, joinedValues });
     return { type, valuesAndLabels, joinedValues };
 };
 function removeEnumTypesWithSameValues(enumTypeCollection) {
     const result = _.uniqBy(enumTypeCollection, element => {
         return element.type + element.joinedValues;
     });
-    // console.log('#enumTypes with and without duplicates', enumTypeCollection.length, result.length);
-    // console.log('======================> original <======================', enumTypeCollection);
-    // console.log('======================> result <======================', result);
     return result;
-    // // get enumTypes with duplicate enumValues
-    // let groupped = _.groupBy(enumTypeCollection, (e) => { return e.joinedValues });
-    // var duplicates = _.uniqBy(_.flatten(_.filter(groupped, (g) => { return g.length > 1 })), element => { return element.type; });
-    // console.log('duplicates', JSON.stringify(duplicates));
-    // // prefix enumValue.pascalCaseValue with typeName to make sure the genertaed Go consts are unique
-    // _.forEach(duplicates, (item, key) => {
-    //     // _.forEach(item.values, (value) => {
-    //     //     value.pascalCaseValue = `${item.typeName}${value.pascalCaseValue}`;
-    //     // });
-    // })
-    // // console.log('enumTypeCollection', JSON.stringify(enumTypeCollection));
-    // return enumTypeCollection;
 }
 const getEnumValuesAndLabels = enumValues => enumValues.map((value, key) => {
     return {
