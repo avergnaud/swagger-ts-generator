@@ -90,18 +90,13 @@ export function convertNamespaceToPath(namespace:any) {
     return result;
 }
 
-export function getTypeFromDescription(description:any) {
-    if (hasTypeFromDescription(description)) {
-        description = description.replace('ts-type', '');
-        return description.replace('type', '').trim();
-    }
-    return description;
+export function getTypeFromDescription(description?:string): string | undefined {
+    const result = description && description.replace('ts-type', '').replace('type', '').trim()
+    return hasTypeFromDescription(description) ? result : undefined
 }
-export function hasTypeFromDescription(description:any) {
-    if (description) {
-        return (description.startsWith('ts-type') || description.startsWith('type'));
-    }
-    return false;
+
+export function hasTypeFromDescription(description?:string): boolean {
+    return description ? (description.startsWith('ts-type') || description.startsWith('type')): false;
 }
 
 export function getSortedObjectProperties(object:any) {

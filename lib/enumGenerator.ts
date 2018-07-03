@@ -113,18 +113,7 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
     _.forEach(node, function (item:SwaggerDefinition, key:any) {
         if (_.isObject(item) && (!utils.isInTypesToFilter(item, key, options))) {
             if (item.enum) {
-                let type = enumArrayType ? enumArrayType : key;
-                // description may contain an overrule type, eg /** type coverType */
-                if (utils.hasTypeFromDescription(item.description)) {
-                    type = _.lowerFirst(utils.getTypeFromDescription(item.description));
-                }
-                const values = item.enum;
-                const valuesAndLabels= getEnumValuesAndLabels(values)
-                const joinedValues= values.join(';') // with joined values to detect enums with the same values
-                let enumType : EnumType= {type,valuesAndLabels,joinedValues};
-                // console.log(enumType);
-                // console.log('--------------------');
-                enumTypeCollection.push(enumType)
+                enumTypeCollection.push(processEnumDefinition(item.enum, key,item.description, enumArrayType))
             } else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
@@ -138,6 +127,16 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
             }
         }
     });
+}
+
+const processEnumDefinition = (enumValues: string[], key: any,description?: string, enumArrayType?: any): EnumType => {
+    const typeFromDescription = utils.getTypeFromDescription(description)
+    // description may contain an overrule type, eg /** type coverType */
+    let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key
+    const valuesAndLabels = getEnumValuesAndLabels(enumValues)
+    const joinedValues = enumValues.join(';') // with joined values to detect enums with the same values
+    // console.log(enumType);
+    return { type, valuesAndLabels, joinedValues };
 }
 
 function removeEnumTypesWithSameValues(enumTypeCollection:any) {
