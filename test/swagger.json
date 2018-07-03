@@ -681,6 +681,10 @@
         }
       },
       "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.darva.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
+    },
+    "test" : {
+      "enum" : [ "test1", "test2", "test3", "test4", "test4", "test5" ],
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.darva.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
     }
   },
   "externalDocs": {

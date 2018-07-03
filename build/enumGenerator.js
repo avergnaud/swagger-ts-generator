@@ -92,7 +92,13 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
                 if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties)) {
-                    console.log("found darva", key);
+                    const zipNameValue = (a, b) => ({ name: a, label: b });
+                    const darvaEnumItem = {
+                        properties: {},
+                        enum: _.zipWith(item.properties.name.enum, item.properties.label.enum, zipNameValue)
+                    };
+                    console.log(darvaEnumItem);
+                    filterEnumDefinitions(enumTypeCollection, darvaEnumItem, options, enumArrayType);
                 }
                 else if (item.type === 'array') {
                     enumArrayType = key;

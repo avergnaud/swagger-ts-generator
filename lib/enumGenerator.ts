@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 let _ = require('lodash');
 import * as  utils from './utils'
-import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties } from './typingsSwagger';
+import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties, EnumValue } from './typingsSwagger';
 
 interface EnumType {
     type: string;
@@ -118,7 +118,13 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
                 if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties) ) {
-                    console.log("found darva", key)
+                    const zipNameValue = (a:string, b:string) => ({ name:a , label:b})
+                    const darvaEnumItem: SwaggerDefinition = {
+                        properties: {},
+                        enum: _.zipWith(item.properties.name.enum, item.properties.label.enum , zipNameValue )
+                    }
+                    console.log(darvaEnumItem)
+                    filterEnumDefinitions(enumTypeCollection, darvaEnumItem as {}, options, enumArrayType);
                 } else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
@@ -136,7 +142,7 @@ const hasDarvaEnum = (itemProperty: SwaggerDefinitionProperties):boolean => {
     return name && label && name.enum !== undefined && label.enum !== undefined
 }
 
-const processEnumDefinition = (enumValues: string[], key: any,description?: string, enumArrayType?: any): EnumType => {
+const processEnumDefinition = (enumValues: EnumValue, key: any,description?: string, enumArrayType?: any): EnumType => {
     const typeFromDescription = utils.getTypeFromDescription(description)
     // description may contain an overrule type, eg /** type coverType */
     let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key

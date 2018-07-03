@@ -36,4 +36,13 @@ export enum label {
     Autre = <any>"Autre",
 }
 
+export enum test {
+    test1 = <any>"test1",
+    test2 = <any>"test2",
+    test3 = <any>"test3",
+    test4 = <any>"test4",
+    test4 = <any>"test4",
+    test5 = <any>"test5",
+}
+
 

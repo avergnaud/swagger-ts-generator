@@ -60,12 +60,13 @@ export interface SwaggerHttpEndpoint {
     deprecated: boolean;
 }
 
+export type EnumValue= Array<string|NameLabelEnum>
 export interface SwaggerDefinition extends Schema {
-    properties: SwaggerDefinitionProperties;
-    description?: string;
-    required?: (keyof SwaggerDefinitionProperties)[];
-    allOf?: SwaggerDefinition[];
-    enum?: string[];
+    properties: SwaggerDefinitionProperties
+    description?: string
+    required?: (keyof SwaggerDefinitionProperties)[]
+    allOf?: SwaggerDefinition[]
+    enum?: EnumValue
 }
 
 export interface SwaggerPropertyDefinition extends Schema {
