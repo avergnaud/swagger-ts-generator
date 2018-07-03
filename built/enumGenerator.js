@@ -112,12 +112,10 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
                 let enumArrayType = undefined;
                 if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties)) {
                     const zipNameValue = (a, b) => ({ name: a, label: b });
-                    const darvaEnumItem = {
-                        properties: {},
-                        enum: _.zipWith(item.properties.name.enum, item.properties.label.enum, zipNameValue)
-                    };
-                    console.log(darvaEnumItem);
+                    const zipEnumValues = _.zipWith(item.properties.name.enum, item.properties.label.enum, zipNameValue);
+                    const darvaEnumItem = { properties: {}, enum: zipEnumValues };
                     filterEnumDefinitions(enumTypeCollection, darvaEnumItem, options, enumArrayType);
+                    enumTypeCollection.push(processEnumDefinition(zipEnumValues, key, item.description, enumArrayType));
                 } else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
@@ -126,6 +124,8 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
                 }
                 filterEnumDefinitions(enumTypeCollection, item, options, enumArrayType);
             }
+        } else {
+            console.log("error");
         }
     });
 }
@@ -138,8 +138,9 @@ const processEnumDefinition = (enumValues, key, description, enumArrayType) => {
     // description may contain an overrule type, eg /** type coverType */
     let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key;
     const valuesAndLabels = getEnumValuesAndLabels(enumValues);
+    //console.log("processEnumDefinition", enumValues);
     const joinedValues = enumValues.join(';'); // with joined values to detect enums with the same values
-    // console.log(enumType);
+    console.log({ type, valuesAndLabels, joinedValues });
     return { type, valuesAndLabels, joinedValues };
 };
 function removeEnumTypesWithSameValues(enumTypeCollection) {
@@ -163,15 +164,10 @@ function removeEnumTypesWithSameValues(enumTypeCollection) {
     // // console.log('enumTypeCollection', JSON.stringify(enumTypeCollection));
     // return enumTypeCollection;
 }
-function getEnumValuesAndLabels(enumValues) {
-    let result = new Array();
-    enumValues.forEach((value, key) => {
-        const valueAndLabel = {
-            value: value,
-            // only convert label when the value contains not only uppercase chars (only uppercase are considered codes like Country)
-            label: _.upperCase(value) !== value ? _.startCase(value) : value
-        };
-        result.push(valueAndLabel);
-    });
-    return result;
-}
+const getEnumValuesAndLabels = enumValues => enumValues.map((value, key) => {
+    return {
+        value: _.isObject(value) ? value.name : value,
+        // only convert label when the value contains not only uppercase chars (only uppercase are considered codes like Country)
+        label: _.isObject(value) ? value.label : _.upperCase(value) !== value ? _.startCase(value) : value
+    };
+});

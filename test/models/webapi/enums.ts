@@ -18,6 +18,15 @@ export enum status {
     sold = <any>"sold",
 }
 
+export enum MotifDeModificationRendezVous {
+    ErreurDeSaisie = <any>"ErreurDeSaisie",
+    ClientIndisponible = <any>"ClientIndisponible",
+    ExpertIndisponible = <any>"ExpertIndisponible",
+    TiersIndisponible = <any>"TiersIndisponible",
+    DossierIncomplet = <any>"DossierIncomplet",
+    Autre = <any>"Autre",
+}
+
 export enum name {
     ErreurDeSaisie = <any>"ErreurDeSaisie",
     ClientIndisponible = <any>"ClientIndisponible",

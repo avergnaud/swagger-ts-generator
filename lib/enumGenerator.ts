@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 let _ = require('lodash');
 import * as  utils from './utils'
-import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties, EnumValue } from './typingsSwagger';
+import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties, EnumValue, NameLabelEnum } from './typingsSwagger';
 
 interface EnumType {
     type: string;
@@ -47,7 +47,6 @@ const generateEnums = (data:generateEnumsData, template:string, outputFileName:s
         utils.log(`generated ${data.enumTypeCollection.length}  enums in ${outputFileName}`);
     }
 }
-
 
 export function generateEnumLanguageFiles(swagger:Swagger, options:GeneratorOptions) {
     _.each(options.enumLanguageFiles, (outputFileName:any) => {
@@ -119,12 +118,11 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
                 let enumArrayType = undefined;
                 if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties) ) {
                     const zipNameValue = (a:string, b:string) => ({ name:a , label:b})
-                    const darvaEnumItem: SwaggerDefinition = {
-                        properties: {},
-                        enum: _.zipWith(item.properties.name.enum, item.properties.label.enum , zipNameValue )
-                    }
-                    console.log(darvaEnumItem)
+                    const zipEnumValues = _.zipWith(item.properties.name.enum, item.properties.label.enum , zipNameValue )
+                    const darvaEnumItem: SwaggerDefinition = { properties: {}, enum: zipEnumValues }
                     filterEnumDefinitions(enumTypeCollection, darvaEnumItem as {}, options, enumArrayType);
+                    enumTypeCollection.push(processEnumDefinition(zipEnumValues, key,item.description, enumArrayType))
+
                 } else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
@@ -133,6 +131,8 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
                 }
                 filterEnumDefinitions(enumTypeCollection, item as {}, options, enumArrayType);
             }
+        } else {
+            console.log("error")
         }
     });
 }
@@ -147,9 +147,10 @@ const processEnumDefinition = (enumValues: EnumValue, key: any,description?: str
     // description may contain an overrule type, eg /** type coverType */
     let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key
     const valuesAndLabels = getEnumValuesAndLabels(enumValues)
+    //console.log("processEnumDefinition", enumValues);
     const joinedValues = enumValues.join(';') // with joined values to detect enums with the same values
-    // console.log(enumType);
-    return { type, valuesAndLabels, joinedValues };
+    console.log({ type, valuesAndLabels, joinedValues })
+    return { type, valuesAndLabels, joinedValues }
 }
 
 function removeEnumTypesWithSameValues(enumTypeCollection:any) {
@@ -174,16 +175,10 @@ function removeEnumTypesWithSameValues(enumTypeCollection:any) {
     // return enumTypeCollection;
 }
 
-function getEnumValuesAndLabels(enumValues:any) {
-    let result = new Array();
-    enumValues.forEach((value:any, key:any) => {
-        const valueAndLabel = {
-            value: value,
+const getEnumValuesAndLabels = (enumValues:EnumValue) => enumValues.map((value, key) => {
+    return {
+            value: _.isObject(value) ? ( value as NameLabelEnum).name : value as string ,
             // only convert label when the value contains not only uppercase chars (only uppercase are considered codes like Country)
-            label: _.upperCase(value) !== value ? _.startCase(value) : value
-        }
-        result.push(valueAndLabel);
-    });
-
-    return result;
-}
+            label: _.isObject(value) ? ( value as NameLabelEnum).label : _.upperCase(value) !== value ? _.startCase(value) : value
+    }
+})
