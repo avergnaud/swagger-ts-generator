@@ -99,17 +99,11 @@ function convertNamespaceToPath(namespace) {
     return result;
 }
 function getTypeFromDescription(description) {
-    if (hasTypeFromDescription(description)) {
-        description = description.replace('ts-type', '');
-        return description.replace('type', '').trim();
-    }
-    return description;
+    const result = description && description.replace('ts-type', '').replace('type', '').trim();
+    return hasTypeFromDescription(description) ? result : undefined;
 }
 function hasTypeFromDescription(description) {
-    if (description) {
-        return description.startsWith('ts-type') || description.startsWith('type');
-    }
-    return false;
+    return description ? description.startsWith('ts-type') || description.startsWith('type') : false;
 }
 function getSortedObjectProperties(object) {
     const result = _(object).toPairs().sortBy(0).fromPairs().value();

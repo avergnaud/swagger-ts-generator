@@ -5,5 +5,18 @@
   "delivered": "Delivered",
   "available": "Available",
   "pending": "Pending",
-  "sold": "Sold"
+  "sold": "Sold",
+  "name": "-------ENUM-TYPE-------",
+  "ErreurDeSaisie": "Erreur De Saisie",
+  "ClientIndisponible": "Client Indisponible",
+  "ExpertIndisponible": "Expert Indisponible",
+  "TiersIndisponible": "Tiers Indisponible",
+  "DossierIncomplet": "Dossier Incomplet",
+  "Autre": "Autre",
+  "label": "-------ENUM-TYPE-------",
+  "Erreur de saisie": "Erreur De Saisie",
+  "Client indisponible": "Client Indisponible",
+  "Expert indisponible": "Expert Indisponible",
+  "Tiers indisponible": "Tiers Indisponible",
+  "Dossier incomplet / En attente retour client": "Dossier Incomplet En Attente Retour Client"
 }

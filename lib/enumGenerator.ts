@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 let _ = require('lodash');
 import * as  utils from './utils'
-import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition } from './typingsSwagger';
+import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties } from './typingsSwagger';
 
 interface EnumType {
     type: string;
@@ -117,7 +117,9 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
             } else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
-                if (item.type === 'array') {
+                if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties) ) {
+                    console.log("found darva", key)
+                } else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
                         enumArrayType = _.lowerFirst(utils.getTypeFromDescription(item.description))
@@ -127,6 +129,11 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
             }
         }
     });
+}
+
+const hasDarvaEnum = (itemProperty: SwaggerDefinitionProperties):boolean => {
+    const { name , label } = itemProperty
+    return name && label && name.enum !== undefined && label.enum !== undefined
 }
 
 const processEnumDefinition = (enumValues: string[], key: any,description?: string, enumArrayType?: any): EnumType => {

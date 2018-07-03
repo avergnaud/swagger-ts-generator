@@ -666,6 +666,21 @@
         "type": { "type": "string" },
         "message": { "type": "string" }
       }
+    },
+    "MotifDeModificationRendezVous" : {
+      "type" : "object",
+      "required" : [ "name" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "enum" : [ "ErreurDeSaisie", "ClientIndisponible", "ExpertIndisponible", "TiersIndisponible", "DossierIncomplet", "Autre" ]
+        },
+        "label" : {
+          "type" : "string",
+          "enum" : [ "Erreur de saisie", "Client indisponible", "Expert indisponible", "Tiers indisponible", "Dossier incomplet / En attente retour client", "Autre" ]
+        }
+      },
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.darva.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
     }
   },
   "externalDocs": {

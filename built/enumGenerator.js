@@ -101,30 +101,18 @@ function getEnumDefinitions(swagger, options) {
     // console.log('enumTypeCollection', enumTypeCollection);
     return enumTypeCollection;
 }
+// function recursive
 function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType) {
     _.forEach(node, function (item, key) {
         if (_.isObject(item) && !utils.isInTypesToFilter(item, key, options)) {
             if (item.enum) {
-                let type = enumArrayType ? enumArrayType : key;
-                let values = item.enum;
-                let enumType = {
-                    'type': type,
-                    valuesAndLabels: getEnumValuesAndLabels(values),
-                    joinedValues: undefined
-                };
-                // description may contain an overrule type, eg /** type coverType */
-                if (utils.hasTypeFromDescription(item.description)) {
-                    enumType.type = _.lowerFirst(utils.getTypeFromDescription(item.description));
-                }
-                // add string with joined values so enums with the same values can be detected
-                enumType.joinedValues = values.join(';');
-                // console.log(enumType);
-                // console.log('--------------------');
-                enumTypeCollection.push(enumType);
+                enumTypeCollection.push(processEnumDefinition(item.enum, key, item.description, enumArrayType));
             } else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
-                if (item.type === 'array') {
+                if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties)) {
+                    console.log("found darva", key);
+                } else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
                         enumArrayType = _.lowerFirst(utils.getTypeFromDescription(item.description));
@@ -135,6 +123,19 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
         }
     });
 }
+const hasDarvaEnum = itemProperty => {
+    const { name, label } = itemProperty;
+    return name && label && name.enum !== undefined && label.enum !== undefined;
+};
+const processEnumDefinition = (enumValues, key, description, enumArrayType) => {
+    const typeFromDescription = utils.getTypeFromDescription(description);
+    // description may contain an overrule type, eg /** type coverType */
+    let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key;
+    const valuesAndLabels = getEnumValuesAndLabels(enumValues);
+    const joinedValues = enumValues.join(';'); // with joined values to detect enums with the same values
+    // console.log(enumType);
+    return { type, valuesAndLabels, joinedValues };
+};
 function removeEnumTypesWithSameValues(enumTypeCollection) {
     const result = _.uniqBy(enumTypeCollection, element => {
         return element.type + element.joinedValues;

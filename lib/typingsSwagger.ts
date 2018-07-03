@@ -81,6 +81,11 @@ export interface SwaggerPropertyDefinition extends Schema {
     enum?: string[];
 }
 
+export interface NameLabelEnum {
+  name: string
+  label: string
+}
+
 //--------------options
 export interface GeneratorOptions extends booleanParameters, fileNames {
   modelFolder: string;

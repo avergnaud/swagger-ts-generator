@@ -91,7 +91,10 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
             else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
-                if (item.type === 'array') {
+                if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties)) {
+                    console.log("found darva", key);
+                }
+                else if (item.type === 'array') {
                     enumArrayType = key;
                     if (utils.hasTypeFromDescription(item.description)) {
                         enumArrayType = _.lowerFirst(utils.getTypeFromDescription(item.description));
@@ -102,6 +105,10 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
         }
     });
 }
+const hasDarvaEnum = (itemProperty) => {
+    const { name, label } = itemProperty;
+    return name && label && name.enum !== undefined && label.enum !== undefined;
+};
 const processEnumDefinition = (enumValues, key, description, enumArrayType) => {
     const typeFromDescription = utils.getTypeFromDescription(description);
     // description may contain an overrule type, eg /** type coverType */

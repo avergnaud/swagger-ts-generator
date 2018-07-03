@@ -18,4 +18,22 @@ export enum status {
     sold = <any>"sold",
 }
 
+export enum name {
+    ErreurDeSaisie = <any>"ErreurDeSaisie",
+    ClientIndisponible = <any>"ClientIndisponible",
+    ExpertIndisponible = <any>"ExpertIndisponible",
+    TiersIndisponible = <any>"TiersIndisponible",
+    DossierIncomplet = <any>"DossierIncomplet",
+    Autre = <any>"Autre",
+}
+
+export enum label {
+    Erreur de saisie = <any>"Erreur de saisie",
+    Client indisponible = <any>"Client indisponible",
+    Expert indisponible = <any>"Expert indisponible",
+    Tiers indisponible = <any>"Tiers indisponible",
+    Dossier incomplet / En attente retour client = <any>"Dossier incomplet / En attente retour client",
+    Autre = <any>"Autre",
+}
+
 
