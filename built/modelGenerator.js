@@ -137,34 +137,17 @@ function getTypePropertyValidatorDefinitions(required, item, key, typeName, isEn
         validation: {},
         validatorArray: []
     };
-    if (isRequired) {
-        validators.validation.required = isRequired;
-        validators.validatorArray.push('Validators.required');
+    function pusher(validationkey, value, key) {
+        validators.validation[validationkey] = value;
+        validators.validatorArray.push(key);
     }
-    if ((0, _lodash.has)(item, 'minimum')) {
-        validators.validation.minimum = item.minimum;
-        validators.validatorArray.push(`minValueValidator(${item.minimum})`);
-    }
-    if ((0, _lodash.has)(item, 'maximum')) {
-        validators.validation.maximum = item.maximum;
-        validators.validatorArray.push(`maxValueValidator(${item.maximum})`);
-    }
-    if (isEnum) {
-        validators.validation.enum = `'${item.enum}'`;
-        validators.validatorArray.push(`enumValidator(${typeName})`);
-    }
-    if ((0, _lodash.has)(item, 'minLength')) {
-        validators.validation.minLength = item.minLength;
-        validators.validatorArray.push(`Validators.minLength(${item.minLength})`);
-    }
-    if ((0, _lodash.has)(item, 'maxLength')) {
-        validators.validation.maxLength = item.maxLength;
-        validators.validatorArray.push(`Validators.maxLength(${item.maxLength})`);
-    }
-    if ((0, _lodash.has)(item, 'pattern')) {
-        validators.validation.pattern = `'${item.pattern}'`;
-        validators.validatorArray.push(`Validators.pattern('${item.pattern}')`);
-    }
+    isRequired && pusher('required', isRequired, 'Validators.required');
+    (0, _lodash.has)(item, 'minimum') && pusher('minimum', item.minimum, `minValueValidator(${item.minimum})`);
+    (0, _lodash.has)(item, 'maximum') && pusher('maximum', item.maximum, `maxValueValidator(${item.maximum})`);
+    isEnum && pusher('enum', `'${item.enum}'`, `enumValidator(${typeName})`);
+    (0, _lodash.has)(item, 'minLength') && pusher('minLength', item.minLength, `Validators.minLength(${item.minLength})`);
+    (0, _lodash.has)(item, 'maxLength') && pusher('maxLength', item.maxLength, `Validators.maxLength(${item.maxLength})`);
+    (0, _lodash.has)(item, 'pattern') && pusher('pattern', `'${item.pattern}'`, `Validators.pattern('${item.pattern}')`);
     return validators;
 }
 function getIsUniqueImportType(currentTypeName, baseType, typeProperties) {
@@ -194,9 +177,7 @@ function getTypeNameWithoutNamespacePrefixesToRemove(key, options) {
 const getTypeNameFromItem = (item, propname, options, isEnum) => {
     if (item.type == 'integer') {
         return 'number';
-    } else if (item.type == 'string' && item.format == 'date') {
-        return 'Date';
-    } else if (item.type == 'string' && item.format == 'date-time') {
+    } else if (item.type == 'string' && (item.format == 'date' || item.format == 'date-time')) {
         return 'Date';
     } else if (item.type == 'string' && item.enum) {
         return propname;
