@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "npm run build -- --watch",
-    "publish-patch": "npx babel  build --out-dir built && npm version patch && npm publish"
+    "publish-patch": "npx babel  build --out-dir built && npm version patch && npm publish",
+    "test": "./test/updateSwagger.js"
   },
   "keywords": [
     "Swagger",

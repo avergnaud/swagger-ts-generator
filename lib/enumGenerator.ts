@@ -4,26 +4,42 @@ import fs from 'fs'
 import path from 'path'
 let _ = require('lodash');
 import * as  utils from './utils'
+import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition } from './typingsSwagger';
 
-export function generateEnumTSFile(swagger:any, options:any) {
-    let outputFileName = path.normalize(options.enumTSFile);
-    // get enum definitions from swagger
-    let enumTypeCollection = getEnumDefinitions(swagger, options);
-    //generateTSEnums
-    const { enumModuleName , generateClasses } = options
-    let data = {moduleName: enumModuleName,generateClasses,enumTypeCollection}
-    generateEnums(data,'generate-enum-ts.hbs',outputFileName)
+interface EnumType {
+    type: string;
+    valuesAndLabels: EnumTypeValueAndLabel[];
+    joinedValues: string;
 }
 
-export function generateEnumI18NHtmlFile(swagger:any, options:any) {
-    let outputFileName = path.normalize(options.enumI18NHtmlFile);
-    // get enum definitions from swagger
+interface EnumTypeValueAndLabel {
+    value: string;
+    label: string;
+}
+
+interface generateEnumsData {
+    moduleName?: string,
+    generateClasses?:boolean ,
+    enumTypeCollection:EnumType[]
+}
+
+export function generateEnumTSFile(swagger:Swagger, options:GeneratorOptions) {
+    let outputFileName = path.normalize(options.enumTSFile);
     let enumTypeCollection = getEnumDefinitions(swagger, options);
-    let data = {enumTypeCollection}
+    const { enumModuleName , generateClasses } = options
+    const data: generateEnumsData = {moduleName: enumModuleName,generateClasses,enumTypeCollection}
+    generateEnums(data, 'generate-enum-ts.hbs',outputFileName)
+}
+
+export function generateEnumI18NHtmlFile(swagger:Swagger, options:GeneratorOptions) {
+    let outputFileName = path.normalize(options.enumI18NHtmlFile || 'default file');
+    const data: generateEnumsData = {
+        enumTypeCollection: getEnumDefinitions(swagger, options)
+    }
     generateEnums(data,'generate-enum-i18n-html.hbs',outputFileName)
 }
 
-const generateEnums = (data:any, template:any, outputFileName:any) => {
+const generateEnums = (data:generateEnumsData, template:string, outputFileName:string) => {
     const templateCompiled = utils.readAndCompileTemplateFile(template);
     let result = templateCompiled(data);
     let isChanged = utils.writeFileIfContentsIsChanged(outputFileName, result);
@@ -33,7 +49,7 @@ const generateEnums = (data:any, template:any, outputFileName:any) => {
 }
 
 
-export function generateEnumLanguageFiles(swagger:any, options:any) {
+export function generateEnumLanguageFiles(swagger:Swagger, options:GeneratorOptions) {
     _.each(options.enumLanguageFiles, (outputFileName:any) => {
         outputFileName = path.normalize(outputFileName);
         // read contents of the current language file
@@ -77,8 +93,8 @@ export function generateEnumLanguageFiles(swagger:any, options:any) {
     }
 }
 
-function getEnumDefinitions(swagger:any, options:any) {
-    let enumTypeCollection = new Array();
+function getEnumDefinitions(swagger:Swagger, options:any): EnumType[] {
+    let enumTypeCollection: EnumType[] = new Array();
     filterEnumDefinitions(enumTypeCollection, swagger.definitions, options);
     // filter on unique types
     enumTypeCollection = _.uniq(enumTypeCollection, 'type');
@@ -92,23 +108,20 @@ function getEnumDefinitions(swagger:any, options:any) {
     return enumTypeCollection;
 }
 
-function filterEnumDefinitions(enumTypeCollection:any, node:any, options:any, enumArrayType?:any) {
-    _.forEach(node, function (item:any, key:any) {
+// function recursive
+function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, options:GeneratorOptions, enumArrayType?:any) {
+    _.forEach(node, function (item:SwaggerDefinition, key:any) {
         if (_.isObject(item) && (!utils.isInTypesToFilter(item, key, options))) {
             if (item.enum) {
                 let type = enumArrayType ? enumArrayType : key;
-                let values = item.enum;
-                let enumType = {
-                    'type': type,
-                    valuesAndLabels: getEnumValuesAndLabels(values),
-                    joinedValues:undefined
-                };
                 // description may contain an overrule type, eg /** type coverType */
                 if (utils.hasTypeFromDescription(item.description)) {
-                    enumType.type = _.lowerFirst(utils.getTypeFromDescription(item.description));
+                    type = _.lowerFirst(utils.getTypeFromDescription(item.description));
                 }
-                // add string with joined values so enums with the same values can be detected
-                enumType.joinedValues = values.join(';')
+                const values = item.enum;
+                const valuesAndLabels= getEnumValuesAndLabels(values)
+                const joinedValues= values.join(';') // with joined values to detect enums with the same values
+                let enumType : EnumType= {type,valuesAndLabels,joinedValues};
                 // console.log(enumType);
                 // console.log('--------------------');
                 enumTypeCollection.push(enumType)
@@ -121,7 +134,7 @@ function filterEnumDefinitions(enumTypeCollection:any, node:any, options:any, en
                         enumArrayType = _.lowerFirst(utils.getTypeFromDescription(item.description))
                     }
                 }
-                filterEnumDefinitions(enumTypeCollection, item, options, enumArrayType);
+                filterEnumDefinitions(enumTypeCollection, item as {}, options, enumArrayType);
             }
         }
     });

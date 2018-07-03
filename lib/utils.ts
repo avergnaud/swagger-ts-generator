@@ -16,8 +16,8 @@ export function readAndCompileTemplateFile(templateFileName:any) {
 }
 
 export function readFile(outputFileName:any) {
-    let file = fs.readFileSync(outputFileName, ENCODING);
-    return file;
+    let file = fs.readFileSync(outputFileName, ENCODING)
+    return file
 }
 
 export function writeFile(outputFileName:any, contents:any) {

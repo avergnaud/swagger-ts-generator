@@ -26,18 +26,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 let _ = require('lodash');
 function generateEnumTSFile(swagger, options) {
     let outputFileName = _path2.default.normalize(options.enumTSFile);
-    // get enum definitions from swagger
     let enumTypeCollection = getEnumDefinitions(swagger, options);
-    //generateTSEnums
     const { enumModuleName, generateClasses } = options;
-    let data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
+    const data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
     generateEnums(data, 'generate-enum-ts.hbs', outputFileName);
 }
 function generateEnumI18NHtmlFile(swagger, options) {
-    let outputFileName = _path2.default.normalize(options.enumI18NHtmlFile);
-    // get enum definitions from swagger
-    let enumTypeCollection = getEnumDefinitions(swagger, options);
-    let data = { enumTypeCollection };
+    let outputFileName = _path2.default.normalize(options.enumI18NHtmlFile || 'default file');
+    const data = {
+        enumTypeCollection: getEnumDefinitions(swagger, options)
+    };
     generateEnums(data, 'generate-enum-i18n-html.hbs', outputFileName);
 }
 const generateEnums = (data, template, outputFileName) => {

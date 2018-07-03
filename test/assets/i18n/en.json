@@ -1,0 +1,9 @@
+{
+  "status": "-------ENUM-TYPE-------",
+  "placed": "Placed",
+  "approved": "Approved",
+  "delivered": "Delivered",
+  "available": "Available",
+  "pending": "Pending",
+  "sold": "Sold"
+}

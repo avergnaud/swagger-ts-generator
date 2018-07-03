@@ -5,18 +5,16 @@ let _ = require('lodash');
 import * as utils from './utils';
 export function generateEnumTSFile(swagger, options) {
     let outputFileName = path.normalize(options.enumTSFile);
-    // get enum definitions from swagger
     let enumTypeCollection = getEnumDefinitions(swagger, options);
-    //generateTSEnums
     const { enumModuleName, generateClasses } = options;
-    let data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
+    const data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
     generateEnums(data, 'generate-enum-ts.hbs', outputFileName);
 }
 export function generateEnumI18NHtmlFile(swagger, options) {
-    let outputFileName = path.normalize(options.enumI18NHtmlFile);
-    // get enum definitions from swagger
-    let enumTypeCollection = getEnumDefinitions(swagger, options);
-    let data = { enumTypeCollection };
+    let outputFileName = path.normalize(options.enumI18NHtmlFile || 'default file');
+    const data = {
+        enumTypeCollection: getEnumDefinitions(swagger, options)
+    };
     generateEnums(data, 'generate-enum-i18n-html.hbs', outputFileName);
 }
 const generateEnums = (data, template, outputFileName) => {
@@ -83,23 +81,20 @@ function getEnumDefinitions(swagger, options) {
     // console.log('enumTypeCollection', enumTypeCollection);
     return enumTypeCollection;
 }
+// function recursive
 function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType) {
     _.forEach(node, function (item, key) {
         if (_.isObject(item) && (!utils.isInTypesToFilter(item, key, options))) {
             if (item.enum) {
                 let type = enumArrayType ? enumArrayType : key;
-                let values = item.enum;
-                let enumType = {
-                    'type': type,
-                    valuesAndLabels: getEnumValuesAndLabels(values),
-                    joinedValues: undefined
-                };
                 // description may contain an overrule type, eg /** type coverType */
                 if (utils.hasTypeFromDescription(item.description)) {
-                    enumType.type = _.lowerFirst(utils.getTypeFromDescription(item.description));
+                    type = _.lowerFirst(utils.getTypeFromDescription(item.description));
                 }
-                // add string with joined values so enums with the same values can be detected
-                enumType.joinedValues = values.join(';');
+                const values = item.enum;
+                const valuesAndLabels = getEnumValuesAndLabels(values);
+                const joinedValues = values.join(';'); // with joined values to detect enums with the same values
+                let enumType = { type, valuesAndLabels, joinedValues };
                 // console.log(enumType);
                 // console.log('--------------------');
                 enumTypeCollection.push(enumType);
