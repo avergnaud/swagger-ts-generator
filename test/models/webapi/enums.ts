@@ -4,15 +4,43 @@
 */
 /* tslint:disable */
 
-// generate enum based on strings instead of numbers
-// (see https://blog.rsuter.com/how-to-implement-an-enum-with-string-values-in-typescript/)
-export enum MotifDeModificationRendezVous {
-    ErreurDeSaisie = <any>"Erreur de saisie",
-    ClientIndisponible = <any>"Client indisponible",
-    ExpertIndisponible = <any>"Expert indisponible",
-    TiersIndisponible = <any>"Tiers indisponible",
-    DossierIncomplet = <any>"Dossier incomplet / En attente retour client",
-    Autre = <any>"Autre",
+package sinapps.model.transverse.prestation
+
+import com.darva.model.DarvaEnumFormats.PlayJsonDarvaEnum
+import core.util.IsEnum
+import core.util.labels.Labelled
+import enumeratum.{ Enum, EnumEntry }
+
+import scala.collection.immutable
+
+sealed trait MotifDeModificationRendezVous extends EnumEntry with Labelled
+
+object MotifDeModificationRendezVous extends Enum[MotifDeModificationRendezVous] with PlayJsonDarvaEnum[MotifDeModificationRendezVous] {
+
+    case object ErreurDeSaisie extends MotifDeModificationRendezVous {
+        val label = "Erreur de saisie
+    }
+    case object ClientIndisponible extends MotifDeModificationRendezVous {
+        val label = "Client indisponible
+    }
+    case object ExpertIndisponible extends MotifDeModificationRendezVous {
+        val label = "Expert indisponible
+    }
+    case object TiersIndisponible extends MotifDeModificationRendezVous {
+        val label = "Tiers indisponible
+    }
+    case object DossierIncomplet extends MotifDeModificationRendezVous {
+        val label = "Dossier incomplet / En attente retour client
+    }
+    case object Autre extends MotifDeModificationRendezVous {
+        val label = "Autre
+    }
+
+  override def values: immutable.IndexedSeq[MotifDeModificationRendezVous] = findValues
+  implicit val isEnum: IsEnum[MotifDeModificationRendezVous] = IsEnum.create(values)
+
 }
+
+
 
 

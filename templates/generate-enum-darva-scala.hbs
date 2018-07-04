@@ -4,16 +4,34 @@
 */
 /* tslint:disable */
 
-// generate enum based on strings instead of numbers
-// (see https://blog.rsuter.com/how-mplement-an-enum-with-string-values-in-typescript/)
+package sinapps.model.transverse.prestation
+
+import com.darva.model.DarvaEnumFormats.PlayJsonDarvaEnum
+import core.util.IsEnum
+import core.util.labels.Labelled
+import enumeratum.{ Enum, EnumEntry }
+
+import scala.collection.immutable
+
 {{#enumTypeCollection}}
-export enum {{type}} {
+sealed trait {{type}} extends EnumEntry with Labelled
+
+object {{type}} extends Enum[{{type}}] with PlayJsonDarvaEnum[{{type}}] {
+
 {{#valuesAndLabels}}
-    {{value}} = <any>"{{label}}",
+    case object {{value}} extends {{../type}} {
+        val label = "{{label}}
+    }
 {{/valuesAndLabels}}
+
+  override def values: immutable.IndexedSeq[{{type}}] = findValues
+  implicit val isEnum: IsEnum[{{type}}] = IsEnum.create(values)
+
 }
 
 {{/enumTypeCollection}}
+
+
 
 {{#if generateClasses}}
 /**
