@@ -37,7 +37,6 @@ function generateTSBaseModel(folder, options) {
 }
 function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
     let typeCollection = new Array();
-    // console.log('typesToFilter', options.typesToFilter);
     forEach(swagger.definitions, (item, key) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
@@ -46,8 +45,7 @@ function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
             }
         }
     });
-    // filter on unique types
-    return uniq(typeCollection);
+    return uniq(typeCollection); // filter on unique types
 }
 function getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix) {
     // filter enum types (these are gererated by the enumGenerator)

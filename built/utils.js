@@ -94,9 +94,7 @@ function convertNamespaceToPath(namespace) {
     for (let index = 0; index < parts.length; index++) {
         parts[index] = _.kebabCase(parts[index]);
     }
-    let result = parts.join('/');
-    // let result = namespace.replace(/\./g, '/');
-    return result;
+    return parts.join('/');
 }
 function getTypeFromDescription(description) {
     const result = description && description.replace('ts-type', '').replace('type', '').trim();
@@ -111,13 +109,9 @@ function getSortedObjectProperties(object) {
 }
 function isInTypesToFilter(item, key, options) {
     if (options && options.typesToFilter) {
-        const result = !!_.find(options.typesToFilter, element => {
+        return !!options.typesToFilter.find(element => {
             return element === key;
         });
-        // if (result) {
-        //     console.log('item in typesToFilter', key, result);
-        // }
-        return result;
     }
     return false;
 }

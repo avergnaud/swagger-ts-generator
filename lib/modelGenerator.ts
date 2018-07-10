@@ -44,7 +44,6 @@ function generateTSBaseModel(folder:any, options:any) {
 
 function getTypeDefinitions(swagger:any, options:any, suffix:string, fileSuffix:string):Array<any> {
     let typeCollection = new Array();
-    // console.log('typesToFilter', options.typesToFilter);
     forEach(swagger.definitions, (item:any, key:any) => {
         if (!utils.isInTypesToFilter(item, key, options)) {
             let type = getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix);
@@ -52,9 +51,8 @@ function getTypeDefinitions(swagger:any, options:any, suffix:string, fileSuffix:
                 typeCollection.push(type);
             }
         }
-    });
-    // filter on unique types
-    return uniq(typeCollection)
+    })
+    return uniq(typeCollection) // filter on unique types
 }
 
 interface Type {

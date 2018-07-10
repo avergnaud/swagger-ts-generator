@@ -81,13 +81,11 @@ export function getPathToRoot(namespace:any) {
 }
 
 export function convertNamespaceToPath(namespace:any) {
-    let parts = namespace.split('.');
+    let parts = namespace.split('.')
     for (let index = 0; index < parts.length; index++) {
-        parts[index] =_.kebabCase(parts[index]);
+        parts[index] =_.kebabCase(parts[index])
     }
-    let result = parts.join('/');
-    // let result = namespace.replace(/\./g, '/');
-    return result;
+    return parts.join('/')
 }
 
 export function getTypeFromDescription(description?:string): string | undefined {
@@ -106,11 +104,7 @@ export function getSortedObjectProperties(object:any) {
 
 export function isInTypesToFilter(item:any, key:any, options:any) {
     if (options && options.typesToFilter) {
-        const result = !!_.find(options.typesToFilter, (element:any) => { return element === key; });
-        // if (result) {
-        //     console.log('item in typesToFilter', key, result);
-        // }
-        return result;
+        return !!options.typesToFilter.find( (element:any) => { return element === key; });
     }
     return false;
 }

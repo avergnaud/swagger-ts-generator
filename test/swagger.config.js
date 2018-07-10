@@ -18,7 +18,6 @@ function config() {
             modelModuleName: 'webapi.models',
             enumModuleName: 'webapi.enums',
             enumRef: './enums',
-            typesToFilter: ['ModelAndView','View']
         }
     }
     var config = {
