@@ -2,13 +2,10 @@
 module.exports = config();
 function config() {
     var root = './test/';
-    var srcAppFolder = root ;
     var folders = {
         root: root,
-        srcWebapiFolder: srcAppFolder + 'models/webapi/',
-        srcLanguagesFolder: srcAppFolder + 'assets/i18n/',
-        swaggerFolder: srcAppFolder,
-        enumI18NHtmlFolder: srcAppFolder + 'models/enums/'
+        srcWebapiFolder: root + 'models/webapi/',
+        swaggerFolder: root,
     }
     var files = { swaggerJson: 'swagger.json' }
     var swagger = {
@@ -21,8 +18,6 @@ function config() {
             modelModuleName: 'webapi.models',
             enumModuleName: 'webapi.enums',
             enumRef: './enums',
-            namespacePrefixesToRemove: [],
-            typeNameSuffixesToRemove: [],
             typesToFilter: ['ModelAndView','View']
         }
     }
