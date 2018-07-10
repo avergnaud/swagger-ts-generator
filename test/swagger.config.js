@@ -7,9 +7,8 @@ function config() {
         srcWebapiFolder: root + 'models/webapi/',
         swaggerFolder: root,
     }
-    var files = { swaggerJson: 'swagger.json' }
     var swagger = {
-        swaggerFile: folders.swaggerFolder + files.swaggerJson,
+        swaggerFile: folders.swaggerFolder + 'swagger.json',
         swaggerFolder: folders.swaggerFolder,
         swaggerTSGeneratorOptions: {
             modelFolder: folders.srcWebapiFolder,
@@ -22,7 +21,6 @@ function config() {
     }
     var config = {
         root: root,
-        files: files,
         swagger: swagger,
         folders:folders
     }
