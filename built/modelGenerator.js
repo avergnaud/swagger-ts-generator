@@ -64,8 +64,7 @@ function getTypeDefinitions(swagger, options, suffix, fileSuffix) {
             }
         }
     });
-    // filter on unique types
-    return (0, _lodash.uniq)(typeCollection);
+    return (0, _lodash.uniq)(typeCollection); // filter on unique types
 }
 function getTypeDefinition(swagger, typeCollection, item, key, options, suffix, fileSuffix) {
     // filter enum types (these are gererated by the enumGenerator)

@@ -1,9 +1,5 @@
 # Swagger TypeScript code generator
-Node module to generate TypeScript code for Angular (2 and above) based on Webapi meta data in Swagger v2 format.
-
-Use it in combination with the sibling package [angular-swagger-form-field](https://www.npmjs.com/package/angular-swagger-form-field) to implement reactive forms.
-
-See [angular-swagger-form-field-sample](https://github.com/areijngoudt/angular-swagger-form-field-sample) for a sample how to use the generated classes.
+Node module to generate TypeScript code from swagger file
 
 # Setup
 Download the module with npm:
@@ -12,12 +8,8 @@ Download the module with npm:
 npm install --save-dev swagger-ts-generator
 ```
 
-## Execute the gulp task(s)
+## Execute the generation
 Download the swagger file and generate the code:
-
-```bash
-gulp gen
-```
 
 # Generated files
 
