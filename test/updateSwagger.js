@@ -19,8 +19,4 @@ function genWebapiDownloadSwagger(done) {
   return fs.createReadStream("./src/swagger/file.json")
 }
 
-function log(msg) {
-  $.util.log($.util.colors.yellow(msg));
-}
-
 generateTSFiles(swaggerFile, swaggerTSGeneratorOptions);

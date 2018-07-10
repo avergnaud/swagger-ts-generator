@@ -44,7 +44,6 @@ function generateTSFiles(swaggerInput, options) {
 
     //modelGenerator.generateModelTSFiles(swagger, options);
     enumGenerator.generateEnumTSFile(swagger, options);
-    options.enumI18NHtmlFile && enumGenerator.generateEnumI18NHtmlFile(swagger, options);
-    options.enumLanguageFiles && enumGenerator.generateEnumLanguageFiles(swagger, options);
-
+    // options.enumI18NHtmlFile && enumGenerator.generateEnumI18NHtmlFile(swagger, options);
+    // options.enumLanguageFiles && enumGenerator.generateEnumLanguageFiles(swagger, options);
 }
