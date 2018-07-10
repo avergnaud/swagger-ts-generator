@@ -5,11 +5,10 @@ function config() {
     var folders = {
         root: root,
         srcWebapiFolder: root + 'models/webapi/',
-        swaggerFolder: root,
     }
     var swagger = {
-        swaggerFile: folders.swaggerFolder + 'swagger.json',
-        swaggerFolder: folders.swaggerFolder,
+        swaggerFile: root + 'swagger.json',
+        swaggerFolder: root,
         swaggerTSGeneratorOptions: {
             modelFolder: folders.srcWebapiFolder,
             enumTSFile: folders.srcWebapiFolder + 'enums.ts',
