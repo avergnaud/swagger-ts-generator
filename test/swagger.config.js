@@ -2,10 +2,7 @@
 module.exports = config();
 function config() {
     var root = './test/';
-    var folders = {
-        root: root,
-        srcWebapiFolder: root + 'models/webapi/',
-    }
+    var folders = { srcWebapiFolder: root + 'models/webapi/' }
     var swagger = {
         swaggerFile: root + 'swagger.json',
         swaggerTSGeneratorOptions: {
