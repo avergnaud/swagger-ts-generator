@@ -8,7 +8,6 @@ function config() {
     }
     var swagger = {
         swaggerFile: root + 'swagger.json',
-        swaggerFolder: root,
         swaggerTSGeneratorOptions: {
             modelFolder: folders.srcWebapiFolder,
             enumTSFile: folders.srcWebapiFolder + 'enums.ts',
