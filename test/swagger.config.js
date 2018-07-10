@@ -11,7 +11,6 @@ function config() {
         enumI18NHtmlFolder: srcAppFolder + 'models/enums/'
     }
     var files = { swaggerJson: 'swagger.json' }
-
     var swagger = {
         swaggerFile: folders.swaggerFolder + files.swaggerJson,
         swaggerFolder: folders.swaggerFolder,

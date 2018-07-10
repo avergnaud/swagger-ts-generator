@@ -13,7 +13,6 @@
     "Swagger",
     "Code Generator",
     "models",
-    "ngx",
     "model-driven forms",
     "reactive forms"
   ],
@@ -24,8 +23,7 @@
   "author": "A.Vergnaud & Y.Serra forked thanks to  areijngoudt@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@types/lodash": "^4.14.109",
-    "@types/node": "^10.1.2",
+    "@types/lodash": "^4.14.111",
     "babel": "^6.23.0",
     "babel-core": "^6.26.3",
     "fs": "0.0.2",
@@ -35,17 +33,11 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "@types/node": "^10.5.2",
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "gulp": "^3.9.1",
-    "gulp-jsbeautifier": "^2.1.2",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-notify": "^2.2.0",
-    "gulp-plumber": "^1.2.0",
-    "gulp-streamify": "^1.0.2",
-    "gulp-task-listing": "^1.0.1",
     "request": "^2.83.0",
-    "typescript": "^2.8.3",
+    "typescript": "^2.9.2",
     "vinyl-source-stream": "^1.1.2",
     "yargs": "^4.6.0"
   }

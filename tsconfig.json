@@ -15,7 +15,9 @@
     "pretty": true,
     "rootDir": "lib",
     "strict": true,
-    "target": "es2015"
+    "target": "es2015",
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"]
   },
   "include": ["lib/**/*.ts", "typings/**/*.d.ts"]
 }
