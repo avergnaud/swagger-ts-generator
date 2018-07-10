@@ -18,10 +18,5 @@ function config() {
             enumRef: './enums',
         }
     }
-    var config = {
-        root: root,
-        swagger: swagger,
-        folders:folders
-    }
-    return config;
+    return { root,swagger,folders }
 }
