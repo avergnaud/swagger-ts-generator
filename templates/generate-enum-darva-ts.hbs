@@ -7,17 +7,17 @@
 import { fromLabelleEnum, fromNameLabels } from 'shared/utils/enum'
 
 {{#enumTypeCollection}}
-const {{type}} = fromNameLabels([
+const {{type}}Values = fromNameLabels([
 {{#valuesAndLabels}}
     ["{{value}}","{{label}}"],
 {{/valuesAndLabels}}
 ])
-
+export const {{type}} = fromLabelleEnum({{type}}Values)
+export type {{type}} = keyof typeof {{type}}
 {{/enumTypeCollection}}
 
 
-export const TypeRendezVous = fromLabelleEnum(typeRendezVousValues)
-export type TypeRendezVous = keyof typeof TypeRendezVous
+
 
 {{#if generateClasses}}
 /**

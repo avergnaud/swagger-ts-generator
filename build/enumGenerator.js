@@ -9,8 +9,8 @@ export function generateEnumTSFile(swagger, options) {
     const { enumModuleName, generateClasses } = options;
     const data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
     //generateEnums(data, 'generate-enum-ts.hbs',outputFileName)
-    //generateEnums(data, 'generate-enum-darva-ts.hbs',outputFileName)
-    generateEnums(data, 'generate-enum-darva-scala.hbs', outputFileName);
+    generateEnums(data, 'generate-enum-darva-ts.hbs', outputFileName);
+    //generateEnums(data, 'generate-enum-darva-scala.hbs',outputFileName)
 }
 export function generateEnumI18NHtmlFile(swagger, options) {
     let outputFileName = path.normalize(options.enumI18NHtmlFile || 'default file');
