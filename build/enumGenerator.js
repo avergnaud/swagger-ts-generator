@@ -9,8 +9,8 @@ export function generateEnumTSFile(swagger, options) {
     const { enumModuleName, generateClasses } = options;
     const data = { moduleName: enumModuleName, generateClasses, enumTypeCollection };
     //generateEnums(data, 'generate-enum-ts.hbs',outputFileName)
-    generateEnums(data, 'generate-enum-darva-ts.hbs', outputFileName);
-    //generateEnums(data, 'generate-enum-darva-scala.hbs',outputFileName)
+    generateEnums(data, 'generate-enumvalues-ts.hbs', outputFileName);
+    //generateEnums(data, 'generate-enum-scala.hbs',outputFileName)
 }
 export function generateEnumI18NHtmlFile(swagger, options) {
     let outputFileName = path.normalize(options.enumI18NHtmlFile || 'default file');
@@ -93,11 +93,11 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
             else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
-                if (item.type === 'object' && item.properties && hasDarvaEnum(item.properties)) {
+                if (item.type === 'object' && item.properties && hasSpecificEnum(item.properties)) {
                     const zipNameValue = (a, b) => ({ name: a, label: b });
                     const zipEnumValues = _.zipWith(item.properties.name.enum, item.properties.label.enum, zipNameValue);
-                    const darvaEnumItem = { properties: {}, enum: zipEnumValues };
-                    filterEnumDefinitions(enumTypeCollection, darvaEnumItem, options, enumArrayType);
+                    const specificEnumItem = { properties: {}, enum: zipEnumValues };
+                    filterEnumDefinitions(enumTypeCollection, specificEnumItem, options, enumArrayType);
                     enumTypeCollection.push(processEnumDefinition(zipEnumValues, key, item.description, enumArrayType));
                 }
                 else if (item.type === 'array') {
@@ -111,7 +111,7 @@ function filterEnumDefinitions(enumTypeCollection, node, options, enumArrayType)
         }
     });
 }
-const hasDarvaEnum = (itemProperty) => {
+const hasSpecificEnum = (itemProperty) => {
     const { name, label } = itemProperty;
     return name && label && name.enum !== undefined && label.enum !== undefined;
 };

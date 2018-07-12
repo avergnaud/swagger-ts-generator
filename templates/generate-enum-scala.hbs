@@ -6,7 +6,7 @@
 
 package sinapps.model.transverse.prestation
 
-import com.darva.model.DarvaEnumFormats.PlayJsonDarvaEnum
+import com.nasa.model.NasaEnumFormats.PlayJsonNasaEnum
 import core.util.IsEnum
 import core.util.labels.Labelled
 import enumeratum.{ Enum, EnumEntry }
@@ -16,7 +16,7 @@ import scala.collection.immutable
 {{#enumTypeCollection}}
 sealed trait {{type}} extends EnumEntry with Labelled
 
-object {{type}} extends Enum[{{type}}] with PlayJsonDarvaEnum[{{type}}] {
+object {{type}} extends Enum[{{type}}] with PlayJsonNasaEnum[{{type}}] {
 
 {{#valuesAndLabels}}
     case object {{value}} extends {{../type}} {

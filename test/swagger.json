@@ -680,11 +680,11 @@
           "enum" : [ "Erreur de saisie", "Client indisponible", "Expert indisponible", "Tiers indisponible", "Dossier incomplet / En attente retour client", "Autre" ]
         }
       },
-      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.darva.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
     },
     "test" : {
       "enum" : [ "test1", "test2", "test3", "test4", "test4", "test5" ],
-      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.darva.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
     }
   },
   "externalDocs": {
