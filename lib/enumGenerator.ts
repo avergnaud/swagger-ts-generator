@@ -3,6 +3,7 @@
 import fs from 'fs'
 import path from 'path'
 let _ = require('lodash');
+import { keys } from 'lodash'
 import * as  utils from './utils'
 import { Swagger, GeneratorOptions, SwaggerDefinitions, SwaggerDefinition, SwaggerDefinitionProperties, EnumValue, NameLabelEnum } from './typingsSwagger';
 
@@ -23,14 +24,26 @@ interface generateEnumsData {
     enumTypeCollection:EnumType[]
 }
 
+interface DebreefingReport {
+    hasDuplicates : boolean
+    enumNumber: number
+    unbalancedEnums : string[]
+}
+
+const debreefingReport: DebreefingReport =  {
+    hasDuplicates : false,
+    enumNumber: 0,
+    unbalancedEnums : []
+}
+
 export function generateEnumTSFile(swagger:Swagger, options:GeneratorOptions) {
     let outputFileName = path.normalize(options.enumTSFile);
     let enumTypeCollection = getEnumDefinitions(swagger, options);
     const { enumModuleName , generateClasses } = options
     const data: generateEnumsData = {moduleName: enumModuleName,generateClasses,enumTypeCollection}
     //generateEnums(data, 'generate-enum-ts.hbs',outputFileName)
-    generateEnums(data, 'generate-enumvalues-ts.hbs',outputFileName)
-    //generateEnums(data, 'generate-enum-scala.hbs',outputFileName)
+    const debreef = generateEnums(data, 'generate-enumvalues-ts.hbs',outputFileName)
+    console.log('debreef', debreef)
 }
 
 export function generateEnumI18NHtmlFile(swagger:Swagger, options:GeneratorOptions) {
@@ -41,17 +54,18 @@ export function generateEnumI18NHtmlFile(swagger:Swagger, options:GeneratorOptio
     generateEnums(data,'generate-enum-i18n-html.hbs',outputFileName)
 }
 
-const generateEnums = (data:generateEnumsData, template:string, outputFileName:string) => {
+const generateEnums = (data:generateEnumsData, template:string, outputFileName:string):DebreefingReport => {
     const templateCompiled = utils.readAndCompileTemplateFile(template);
     let result = templateCompiled(data);
     let isChanged = utils.writeFileIfContentsIsChanged(outputFileName, result);
     if (isChanged) {
         utils.log(`generated ${data.enumTypeCollection.length}  enums in ${outputFileName}`);
     }
+    return debreefingReport
 }
 
 export function generateEnumLanguageFiles(swagger:Swagger, options:GeneratorOptions) {
-    _.each(options.enumLanguageFiles, (outputFileName:any) => {
+    options.enumLanguageFiles && options.enumLanguageFiles.forEach( (outputFileName:any) => {
         outputFileName = path.normalize(outputFileName);
         // read contents of the current language file
         utils.ensureFile(outputFileName, '{}');
@@ -66,7 +80,7 @@ export function generateEnumLanguageFiles(swagger:Swagger, options:GeneratorOpti
     function buildNewEnumLanguage(enumTypeCollection:any, enumLanguage:any) {
         let result = false;
         let currentEnumLanguage = _.clone(enumLanguage);
-        let properties = _.keys(enumLanguage);
+        let properties = keys(enumLanguage);
         properties.map((property:any) => {
             _.unset(enumLanguage, property);
         });
@@ -98,14 +112,14 @@ function getEnumDefinitions(swagger:Swagger, options:any): EnumType[] {
     let enumTypeCollection: EnumType[] = new Array();
     filterEnumDefinitions(enumTypeCollection, swagger.definitions, options);
     // filter on unique types
-    enumTypeCollection = _.uniq(enumTypeCollection, 'type');
+    const uniquedEnumTypeCollection: EnumType[] = _.uniq(enumTypeCollection, 'type');
+    uniquedEnumTypeCollection.length !== enumTypeCollection.length ? console.log("duplicates") : null
     // patch enumTypes which have the same values (to prevent non-unique consts in Go)
     enumTypeCollection = removeEnumTypesWithSameValues(enumTypeCollection);
     // sort on type
     if (options.sortEnumTypes) {
         enumTypeCollection = _.sortBy(enumTypeCollection, 'type');
     }
-    // console.log('enumTypeCollection', enumTypeCollection);
     return enumTypeCollection;
 }
 
@@ -118,9 +132,10 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
             } else {
                 // enum array's has enum definition one level below (under "items")
                 let enumArrayType = undefined;
-                if (item.type === 'object' && item.properties && hasSpecificEnum(item.properties) ) {
+                if (item.type === 'object' && item.properties && hasSpecificEnum(item.properties, key) ) {
+                    const { name, label} = item.properties
                     const zipNameValue = (a:string, b:string) => ({ name:a , label:b})
-                    const zipEnumValues = _.zipWith(item.properties.name.enum, item.properties.label.enum , zipNameValue )
+                    const zipEnumValues = _.zipWith(name.enum, label.enum , zipNameValue )
                     const specificEnumItem: SwaggerDefinition = { properties: {}, enum: zipEnumValues }
                     filterEnumDefinitions(enumTypeCollection, specificEnumItem as {}, options, enumArrayType);
                     enumTypeCollection.push(processEnumDefinition(zipEnumValues, key,item.description, enumArrayType))
@@ -136,17 +151,24 @@ function filterEnumDefinitions(enumTypeCollection:any, node:SwaggerDefinitions, 
     });
 }
 
-const hasSpecificEnum = (itemProperty: SwaggerDefinitionProperties):boolean => {
-    const { name , label } = itemProperty
-    return name && label && name.enum !== undefined && label.enum !== undefined
+const hasSpecificEnum = ({ name , label }: SwaggerDefinitionProperties, enumName: string):boolean => {
+    if (name && label && name.enum !== undefined && label.enum !== undefined) {
+        //check if well balanced
+        if (name.enum.length !== label.enum.length) {
+            console.error(enumName + 'is unbalanced')
+            debreefingReport.unbalancedEnums.push(enumName)
+            return false
+        }  else return true
+    } else return false
 }
+
+
 
 const processEnumDefinition = (enumValues: EnumValue, key: any,description?: string, enumArrayType?: any): EnumType => {
     const typeFromDescription = utils.getTypeFromDescription(description)
     // description may contain an overrule type, eg /** type coverType */
     let type = enumArrayType ? enumArrayType : typeFromDescription ? _.lowerFirst(typeFromDescription) : key
     const valuesAndLabels = getEnumValuesAndLabels(enumValues)
-    //console.log("processEnumDefinition", enumValues);
     const joinedValues = enumValues.join(';') // with joined values to detect enums with the same values
     return { type, valuesAndLabels, joinedValues }
 }

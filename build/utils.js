@@ -1,14 +1,17 @@
 "use strict";
 /* global __dirname */
-let fs = require('fs');
-let path = require('path');
-let handlebars = require('handlebars');
+import * as fs from 'fs';
+import * as path from 'path';
+import handlebars from 'handlebars';
 let moment = require('moment');
 let _ = require('lodash');
 const TEMPLATE_FOLDER = '../templates';
 export const ENCODING = 'utf8';
 export function readAndCompileTemplateFile(templateFileName) {
     let templateSource = fs.readFileSync(path.resolve(__dirname, TEMPLATE_FOLDER, templateFileName), ENCODING);
+    handlebars.registerHelper('escape', function (variable) {
+        return variable.replace(/(['"])/g, '\\$1');
+    });
     let template = handlebars.compile(templateSource);
     return template;
 }

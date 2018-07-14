@@ -4,6 +4,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.ENCODING = undefined;
 exports.readAndCompileTemplateFile = readAndCompileTemplateFile;
 exports.readFile = readFile;
 exports.writeFile = writeFile;
@@ -19,16 +20,33 @@ exports.hasTypeFromDescription = hasTypeFromDescription;
 exports.getSortedObjectProperties = getSortedObjectProperties;
 exports.isInTypesToFilter = isInTypesToFilter;
 exports.log = log;
-let fs = require('fs');
-let path = require('path');
-let handlebars = require('handlebars');
+
+var _fs = require('fs');
+
+var fs = _interopRequireWildcard(_fs);
+
+var _path = require('path');
+
+var path = _interopRequireWildcard(_path);
+
+var _handlebars = require('handlebars');
+
+var _handlebars2 = _interopRequireDefault(_handlebars);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 let moment = require('moment');
 let _ = require('lodash');
 const TEMPLATE_FOLDER = '../templates';
 const ENCODING = exports.ENCODING = 'utf8';
 function readAndCompileTemplateFile(templateFileName) {
     let templateSource = fs.readFileSync(path.resolve(__dirname, TEMPLATE_FOLDER, templateFileName), ENCODING);
-    let template = handlebars.compile(templateSource);
+    _handlebars2.default.registerHelper('escape', function (variable) {
+        return variable.replace(/(['"])/g, '\\$1');
+    });
+    let template = _handlebars2.default.compile(templateSource);
     return template;
 }
 function readFile(outputFileName) {

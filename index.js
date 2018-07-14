@@ -4,6 +4,7 @@
 let fs = require('fs');
 let path = require('path');
 let _ = require('lodash');
+var jsonValidator = require('json-dup-key-validator');
 
 let utils = require('./built/utils');
 let modelGenerator = require('./built/modelGenerator');
@@ -13,7 +14,6 @@ module.exports.generateTSFiles = generateTSFiles;
 
 /**
 * Generate TypeScript files based on the given SwaggerFile and some templates
-*
 * @param {string} swaggerInput The fileName of the swagger.json file including path
 * @param {object} options Options which are used during generation
 *                 .modelFolder: the name of the folder (path) to generate the models in.
@@ -25,25 +25,30 @@ module.exports.generateTSFiles = generateTSFiles;
 *                 .enumModuleName: the name of the enum module (aka namespace)
 */
 function generateTSFiles(swaggerInput, options) {
-    // console.log('swagger-ts-generator');
 
+    checkInputParams(swaggerInput,options)
+    let folder = path.normalize(options.modelFolder);
+    // utils.removeFolder(folder);
+
+    const swaggerJson = fs.readFileSync(swaggerInput, utils.ENCODING).trim()
+    const hasDuplicated= jsonValidator.validate(swaggerJson, false);// Returns error or undefined if json is valid
+    if ( hasDuplicated === undefined) {
+        let swagger = JSON.parse(swaggerJson);
+        options.generateClasses = !options.hasOwnProperty("generateClasses");
+        //modelGenerator.generateModelTSFiles(swagger, options);
+        enumGenerator.generateEnumTSFile(swagger, options);
+        // options.enumI18NHtmlFile && enumGenerator.generateEnumI18NHtmlFile(swagger, options);
+        // options.enumLanguageFiles && enumGenerator.generateEnumLanguageFiles(swagger, options);
+    } else {
+        console.error ('error detected:', hasDuplicated)
+    }
+}
+
+function checkInputParams (swaggerInput, options) {
     if (!_.isString(swaggerInput)) {
         throw 'swaggerFileName must be defined';
     }
     if (!_.isObject(options)) {
         throw 'options must be defined';
     }
-
-    let folder = path.normalize(options.modelFolder);
-    // utils.removeFolder(folder);
-
-    let swagger = JSON.parse(fs.readFileSync(swaggerInput, utils.ENCODING).trim());
-
-    if(!options.hasOwnProperty("generateClasses"))
-        options.generateClasses = true;
-
-    //modelGenerator.generateModelTSFiles(swagger, options);
-    enumGenerator.generateEnumTSFile(swagger, options);
-    // options.enumI18NHtmlFile && enumGenerator.generateEnumI18NHtmlFile(swagger, options);
-    // options.enumLanguageFiles && enumGenerator.generateEnumLanguageFiles(swagger, options);
 }

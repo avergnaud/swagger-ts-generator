@@ -1,16 +1,20 @@
 "use strict";
 /* global __dirname */
-let fs = require('fs');
-let path = require('path');
-let handlebars = require('handlebars');
-let moment = require('moment');
-let _ = require('lodash');
+import  * as fs  from 'fs'
+import * as  path from 'path'
+import handlebars  from 'handlebars'
+let moment = require('moment')
+let _  = require('lodash')
 
-const TEMPLATE_FOLDER = '../templates';
-export const ENCODING = 'utf8';
+const TEMPLATE_FOLDER = '../templates'
+export const ENCODING = 'utf8'
 
-export function readAndCompileTemplateFile(templateFileName:any) {
+
+export function readAndCompileTemplateFile(templateFileName:string) {
     let templateSource = fs.readFileSync(path.resolve(__dirname, TEMPLATE_FOLDER, templateFileName), ENCODING);
+    handlebars.registerHelper('escape', function(variable) {
+        return variable.replace(/(['"])/g, '\\$1');
+      });
     let template = handlebars.compile(templateSource);
     return template;
 }
@@ -83,7 +87,7 @@ export function getPathToRoot(namespace:any) {
 export function convertNamespaceToPath(namespace:any) {
     let parts = namespace.split('.')
     for (let index = 0; index < parts.length; index++) {
-        parts[index] =_.kebabCase(parts[index])
+        parts[index] = _.kebabCase(parts[index])
     }
     return parts.join('/')
 }

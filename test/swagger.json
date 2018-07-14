@@ -682,6 +682,36 @@
       },
       "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
     },
+    "MotifDeModificationRendezVousd" : {
+      "type" : "object",
+      "required" : [ "name" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "enum" : [ "DuplErreurDeSaisie", "DuplClientIndisponible", "ExpertIndisponible", "Autre" ]
+        },
+        "label" : {
+          "type" : "string",
+          "enum" : [ "Erreur de saisie", "Client indisponible", "Expert indisponible", "l'Autre" ]
+        }
+      },
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
+    },
+    "AnotherEnum" : {
+      "type" : "object",
+      "required" : [ "name" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "enum" : [ "a", "b", "c", "d", "Autre" ]
+        },
+        "label" : {
+          "type" : "string",
+          "enum" : [ "le a", "le b", "le d","l'Autre" ]
+        }
+      },
+      "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
+    },
     "test" : {
       "enum" : [ "test1", "test2", "test3", "test4", "test4", "test5" ],
       "description" : "[Voir la liste des valeurs possibles](https://wiki.apps.com/display/REFDOC/Valeurs+de+codes#Valeursdecodes-MotifDeModificationRendezVous)"
